@@ -1,0 +1,19 @@
+# Node
+backend/node_modules
+backend/.env
+
+# Flutter
+mobile/.dart_tool
+mobile/build
+mobile/.packages
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
