@@ -3,7 +3,8 @@ import 'package:mobile/constants/app_colors.dart';
 import 'login_text_field.dart';
 import 'login_button.dart';
 
-/// Card glassmorphism que contiene el formulario de login.
+ 
+/// Card blanca flotante con sombra rosada que contiene el formulario.
 class FormCard extends StatelessWidget {
   const FormCard({
     super.key,
@@ -15,7 +16,7 @@ class FormCard extends StatelessWidget {
     required this.onLogin,
     required this.onForgotPassword,
   });
-
+ 
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final bool obscurePassword;
@@ -23,28 +24,22 @@ class FormCard extends StatelessWidget {
   final VoidCallback onTogglePassword;
   final VoidCallback onLogin;
   final VoidCallback onForgotPassword;
-
+ 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-      padding: const EdgeInsets.fromLTRB(18, 24, 18, 20),
+      padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(28),
-        color: AppColors.white.withOpacity(0.05),
-        border: Border.all(
-          color: AppColors.white.withOpacity(0.1),
-          width: 1,
-        ),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.white.withOpacity(0.06),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.6],
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryDark.withOpacity(0.14),
+            blurRadius: 40,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -56,7 +51,7 @@ class FormCard extends StatelessWidget {
             icon: Icons.mail_outline_rounded,
             keyboardType: TextInputType.emailAddress,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           LoginTextField(
             controller: passwordController,
             label: 'Contraseña',
@@ -68,16 +63,13 @@ class FormCard extends StatelessWidget {
                 obscurePassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
-                color: AppColors.white.withOpacity(0.3),
+                color: AppColors.fieldIcon.withOpacity(0.45),
                 size: 18,
               ),
             ),
           ),
           const SizedBox(height: 20),
-          LoginButton(
-            isLoading: isLoading,
-            onPressed: onLogin,
-          ),
+          LoginButton(isLoading: isLoading, onPressed: onLogin),
           const SizedBox(height: 14),
           GestureDetector(
             onTap: onForgotPassword,
@@ -85,7 +77,7 @@ class FormCard extends StatelessWidget {
               '¿Olvidaste tu contraseña?',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.white.withOpacity(0.3),
+                color: AppColors.fieldLabel.withOpacity(0.70),
                 fontSize: 13,
               ),
             ),

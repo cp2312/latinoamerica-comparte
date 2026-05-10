@@ -2,52 +2,59 @@ import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
 import 'package:mobile/painters/background_painter.dart';
 
-/// Capa visual de fondo: gradientes de nebulosa +
-/// decoración pintada (líneas, estrellas, anillos).
+ 
+/// Capa de fondo: gradiente rosado oscuro → blanco,
+/// nebulosas radiales, ola blanca inferior y decoración pintada.
 class BackgroundLayer extends StatelessWidget {
   const BackgroundLayer({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        _buildBaseGradient(),
-        _buildNebula(top: -120, size: 340, opacity: 0.28),
-        _buildNebula(bottom: 100, left: -60, size: 220,
-            color: const Color(0xFF6400C8), opacity: 0.35),
-        _buildNebula(bottom: 200, right: -30, size: 160,
-            color: const Color(0xFFDC64FF), opacity: 0.18),
+        _buildGradient(),
+        _buildNebula(top: -110, size: 320, opacity: 0.30),
+        _buildNebula(
+          bottom: 160,
+          right: -40,
+          size: 180,
+          color: AppColors.heroMid2,
+          opacity: 0.25,
+        ),
+        _buildBottomWave(),
         Positioned.fill(
           child: CustomPaint(painter: BackgroundPainter()),
         ),
       ],
     );
   }
-
-  Widget _buildBaseGradient() {
+ 
+  Widget _buildGradient() {
     return Container(
       decoration: const BoxDecoration(
         gradient: RadialGradient(
-          center: Alignment(0, -0.85),
-          radius: 1.2,
+          center: Alignment(0, -0.9),
+          radius: 1.3,
           colors: [
-            AppColors.purpleMid,
-            AppColors.purpleDeep,
-            AppColors.background,
+            AppColors.heroTop,
+            AppColors.heroMid1,
+            AppColors.heroMid2,
+            AppColors.heroBottom,
+            Colors.white,
           ],
-          stops: [0.0, 0.45, 0.85],
+          stops: [0.0, 0.18, 0.38, 0.55, 0.75],
         ),
       ),
     );
   }
-
+ 
   Widget _buildNebula({
     double? top,
     double? bottom,
     double? left,
     double? right,
     required double size,
-    Color color = AppColors.purpleGlow,
+    Color color = AppColors.heroMid1,
     required double opacity,
   }) {
     return Positioned(
@@ -62,6 +69,23 @@ class BackgroundLayer extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: RadialGradient(
             colors: [color.withOpacity(opacity), Colors.transparent],
+          ),
+        ),
+      ),
+    );
+  }
+ 
+  Widget _buildBottomWave() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 370,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.elliptical(double.infinity, 28),
           ),
         ),
       ),

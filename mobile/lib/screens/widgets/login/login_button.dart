@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
-
-/// Botón principal de login con gradiente morado
-/// y efecto de brillo deslizante (shine).
+ 
+/// Botón principal con gradiente rosado oscuro y efecto shine.
 class LoginButton extends StatefulWidget {
   const LoginButton({
     super.key,
     required this.onPressed,
     required this.isLoading,
   });
-
+ 
   final VoidCallback onPressed;
   final bool isLoading;
-
+ 
   @override
   State<LoginButton> createState() => _LoginButtonState();
 }
-
+ 
 class _LoginButtonState extends State<LoginButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _shineAnimation;
-
+  late final Animation<double> _shine;
+ 
   @override
   void initState() {
     super.initState();
@@ -29,43 +28,46 @@ class _LoginButtonState extends State<LoginButton>
       vsync: this,
       duration: const Duration(milliseconds: 2500),
     )..repeat();
-
-    _shineAnimation = Tween<double>(begin: -1.5, end: 1.5).animate(
+ 
+    _shine = Tween<double>(begin: -1.5, end: 1.5).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
-
+ 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.isLoading ? null : widget.onPressed,
       child: AnimatedBuilder(
-        animation: _shineAnimation,
+        animation: _shine,
         builder: (context, _) => _buildButton(context),
       ),
     );
   }
-
+ 
   Widget _buildButton(BuildContext context) {
     return Container(
-      height: 52,
+      height: 50,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.purpleAccent, AppColors.purpleBright],
+          colors: [AppColors.primary, AppColors.primaryDark],
         ),
-        border: Border.all(
-          color: AppColors.purpleGlow.withOpacity(0.4),
-          width: 1,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryDark.withOpacity(0.32),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -78,12 +80,12 @@ class _LoginButtonState extends State<LoginButton>
       ),
     );
   }
-
+ 
   Widget _buildShine(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Positioned.fill(
       child: Transform.translate(
-        offset: Offset(_shineAnimation.value * screenWidth, 0),
+        offset: Offset(_shine.value * screenWidth, 0),
         child: FractionallySizedBox(
           widthFactor: 0.4,
           child: Container(
@@ -91,7 +93,7 @@ class _LoginButtonState extends State<LoginButton>
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  AppColors.white.withOpacity(0.12),
+                  Colors.white.withOpacity(0.14),
                   Colors.transparent,
                 ],
               ),
@@ -101,7 +103,7 @@ class _LoginButtonState extends State<LoginButton>
       ),
     );
   }
-
+ 
   Widget _buildContent() {
     return Center(
       child: widget.isLoading
@@ -110,17 +112,18 @@ class _LoginButtonState extends State<LoginButton>
               height: 22,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.white,
+                color: Colors.white,
               ),
             )
           : const Text(
               'Iniciar sesión',
               style: TextStyle(
-                color: AppColors.white,
+                color: Colors.white,
                 fontSize: 15,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
     );
   }
 }
+ 

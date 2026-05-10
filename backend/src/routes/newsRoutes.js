@@ -28,6 +28,7 @@ router.put(
   '/:id',
   authMiddleware,
   roleMiddleware('superadmin', 'admin_pais', 'editor'),
+  upload.single('imagen'),
   updateNews
 );
 
