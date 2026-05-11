@@ -1,89 +1,102 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
-import '../constants/app_colors.dart';
-import '../screens/widgets/login/background_layer.dart';
-import '../screens/widgets/login/hero_section.dart';
-import '../screens/widgets/login/form_card.dart';
+import 'package:mobile/services/auth_service.dart';
+import 'package:mobile/constants/app_colors.dart';
+import 'package:mobile/screens/widgets/login/background_layer.dart';
+import 'package:mobile/screens/widgets/login/hero_section.dart';
+import 'package:mobile/screens/widgets/login/form_card.dart';
 import 'package:mobile/dashboard_screen.dart';
- 
-/// Pantalla de login conectada a [AuthService].
-/// Gestiona únicamente estado de UI: loading y visibilidad de contraseña.
+import 'package:mobile/dashboard_admin_pais_screen.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
- 
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
- 
+
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController    = TextEditingController();
   final _passwordController = TextEditingController();
- 
+
   bool _isLoading       = false;
   bool _obscurePassword = true;
- 
+
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
- 
-  // ── Acciones ────────────────────────────────
- 
+
+  // ── Login ────────────────────────────────────────────────────────────────────
+
   Future<void> _onLogin() async {
     final email    = _emailController.text.trim();
     final password = _passwordController.text.trim();
- 
+
     if (email.isEmpty || password.isEmpty) {
       _showSnack('Todos los campos son obligatorios');
       return;
     }
- 
+
     setState(() => _isLoading = true);
- 
-    final success = await AuthService().login(
-      correo: email,
-      password: password,
-    );
- 
+
+    final user = await AuthService().login(correo: email, password: password);
+
     if (!mounted) return;
     setState(() => _isLoading = false);
- 
-  if (success) {
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const DashboardScreen(),
-    ),
-  );
-}else {
+
+    if (user == null) {
       _showSnack('Credenciales incorrectas');
+      return;
+    }
+
+    // ── Redirige según rol ───────────────────────────────────────────────────
+    switch (user.rol) {
+      case 'superadmin':
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        );
+        break;
+
+      case 'admin_pais':
+      case 'editor':
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DashboardAdminPaisScreen(usuario: user),
+          ),
+        );
+        break;
+
+      default:
+        _showSnack('Rol no reconocido: ${user.rol}');
     }
   }
- 
+
   void _onTogglePassword() =>
       setState(() => _obscurePassword = !_obscurePassword);
- 
+
   void _onForgotPassword() {
-    // TODO: Navigator.pushNamed(context, '/forgot-password');
+    // TODO: implementar recuperación de contraseña
   }
- 
+
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
+        content:          Text(message),
+        backgroundColor:  AppColors.primary,
+        behavior:         SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
     );
   }
- 
-  // ── Build ────────────────────────────────────
- 
+
+  // ── Build ────────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
- 
+
   Widget _buildScrollContent(BuildContext context) {
     return SingleChildScrollView(
       padding: EdgeInsets.zero,

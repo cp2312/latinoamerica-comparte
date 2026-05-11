@@ -32,18 +32,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     super.dispose();
   }
 
-  Future<void> pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-    );
-
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        selectedImageName = result.files.first.name;
-      });
-    }
-  }
+ 
 
   Future<void> saveNews() async {
     final success = await NewsService().createNews(
@@ -157,7 +146,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
             const SizedBox(height: 20),
 
             InkWell(
-              onTap: pickImage,
+              
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
