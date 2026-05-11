@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:mobile/screens/models/news_model.dart';
 
 class NewsService {
@@ -40,90 +41,109 @@ class NewsService {
     required String country,
     required String content,
     required String status,
+    PlatformFile? imageFile,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final response = await http.post(
+      var request = http.MultipartRequest(
+        'POST',
         Uri.parse(baseUrl),
+      );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      request.fields['titulo'] = title;
+      request.fields['pais'] = country;
+      request.fields['contenido'] = content;
+      request.fields['estado'] = status;
+
+      if (imageFile != null && imageFile.bytes != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'imagen',
+            imageFile.bytes!,
+            filename: imageFile.name,
+          ),
+        );
+      }
+
+      final response = await request.send();
+
+      print(response.statusCode);
+
+      return response.statusCode == 201;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  // DELETE → eliminar noticia
+  Future<bool> deleteNews(String id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final response = await http.delete(
+        Uri.parse('$baseUrl/$id'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'titulo': title,
-          'pais': country,
-          'contenido': content,
-          'estado': status,
-        }),
       );
 
-      return response.statusCode == 201;
+      return response.statusCode == 200;
     } catch (e) {
-      throw Exception('Error al crear noticia: $e');
+      print(e);
+      return false;
     }
   }
-Future<bool> deleteNews(String id) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
 
-    final response = await http.delete(
-      Uri.parse('$baseUrl/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+  // PUT → actualizar noticia
+  Future<bool> updateNews({
+    required String id,
+    required String title,
+    required String country,
+    required String content,
+    required String status,
+    PlatformFile? imageFile,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
 
-    return response.statusCode == 200;
-  } catch (e) {
-    print(e);
-    return false;
-  }
-}
-Future<bool> updateNews({
-  required String id,
-  required String title,
-  required String country,
-  required String content,
-  required String status,
-  String? imagePath,
-}) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    var request = http.MultipartRequest(
-      'PUT',
-      Uri.parse('$baseUrl/news/$id'),
-    );
-
-    request.headers['Authorization'] = 'Bearer $token';
-
-    request.fields['titulo'] = title;
-    request.fields['pais'] = country;
-    request.fields['contenido'] = content;
-    request.fields['estado'] = status;
-
-    if (imagePath != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'imagen',
-          imagePath,
-        ),
+      var request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/$id'),
       );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      request.fields['titulo'] = title;
+      request.fields['pais'] = country;
+      request.fields['contenido'] = content;
+      request.fields['estado'] = status;
+
+      if (imageFile != null && imageFile.bytes != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'imagen',
+            imageFile.bytes!,
+            filename: imageFile.name,
+          ),
+        );
+      }
+
+      final response = await request.send();
+
+      print(response.statusCode);
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print(e);
+      return false;
     }
-
-    final response = await request.send();
-
-    print(response.statusCode);
-
-    return response.statusCode == 200;
-  } catch (e) {
-    print(e);
-    return false;
   }
-}
 }

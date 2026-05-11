@@ -23,7 +23,8 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   String selectedCountry = 'Colombia';
   String selectedStatus = 'borrador';
 
-  String? selectedImageName;
+String? selectedImageName;
+PlatformFile? selectedImage;
 
   @override
   void dispose() {
@@ -32,25 +33,38 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     super.dispose();
   }
 
-  Future<void> pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-    );
+Future<void> pickImage() async {
+  final result = await FilePicker.platform.pickFiles(
+    type: FileType.image,
+    allowMultiple: false,
+    withData: true,
+  );
 
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        selectedImageName = result.files.first.name;
-      });
-    }
+  if (result != null && result.files.isNotEmpty) {
+    setState(() {
+      selectedImage = result.files.first;
+      selectedImageName = selectedImage!.name;
+    });
   }
+}
 
   Future<void> saveNews() async {
+    if (titleController.text.trim().isEmpty ||
+        contentController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Todos los campos obligatorios deben completarse'),
+        ),
+      );
+      return;
+    }
+
     final success = await NewsService().createNews(
       title: titleController.text.trim(),
       country: selectedCountry,
       content: contentController.text.trim(),
       status: selectedStatus,
+    imageFile: selectedImage,
     );
 
     if (!mounted) return;
@@ -96,21 +110,27 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
 
             const Text(
               'Completa la información de la noticia',
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(
+                fontSize: 14,
+              ),
             ),
 
             const SizedBox(height: 24),
 
             TextField(
               controller: titleController,
-              decoration: _inputDecoration('Título de la noticia'),
+              decoration: _inputDecoration(
+                'Título de la noticia',
+              ),
             ),
 
             const SizedBox(height: 16),
 
             DropdownButtonFormField<String>(
               value: selectedCountry,
-              decoration: _inputDecoration('País'),
+              decoration: _inputDecoration(
+                'País',
+              ),
               items: countries.map((country) {
                 return DropdownMenuItem(
                   value: country,
@@ -129,14 +149,18 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
             TextField(
               controller: contentController,
               maxLines: 5,
-              decoration: _inputDecoration('Contenido'),
+              decoration: _inputDecoration(
+                'Contenido',
+              ),
             ),
 
             const SizedBox(height: 16),
 
             DropdownButtonFormField<String>(
               value: selectedStatus,
-              decoration: _inputDecoration('Estado'),
+              decoration: _inputDecoration(
+                'Estado',
+              ),
               items: const [
                 DropdownMenuItem(
                   value: 'borrador',
@@ -170,11 +194,14 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.image_outlined),
+                    const Icon(
+                      Icons.image_outlined,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        selectedImageName ?? 'Seleccionar imagen',
+                        selectedImageName ??
+                            'Seleccionar imagen',
                       ),
                     ),
                   ],
