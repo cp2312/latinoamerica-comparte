@@ -24,13 +24,16 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
 
+        // Guardar token
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', data['token'] as String);
 
+        // Construir el modelo de usuario desde la respuesta
         final user = UserModel.fromJson(
           data['user'] as Map<String, dynamic>,
         );
 
+        // Persistir datos de sesión
         await prefs.setString('user_rol',    user.rol);
         await prefs.setString('user_nombre', user.nombre);
         if (user.pais != null) {
