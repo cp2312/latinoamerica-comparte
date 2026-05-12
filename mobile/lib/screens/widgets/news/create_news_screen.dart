@@ -23,8 +23,8 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   String selectedCountry = 'Colombia';
   String selectedStatus = 'borrador';
 
-String? selectedImageName;
-PlatformFile? selectedImage;
+  String? selectedImageName;
+  PlatformFile? selectedImage;
 
   @override
   void dispose() {
@@ -33,27 +33,29 @@ PlatformFile? selectedImage;
     super.dispose();
   }
 
-Future<void> pickImage() async {
-  final result = await FilePicker.platform.pickFiles(
-    type: FileType.image,
-    allowMultiple: false,
-    withData: true,
-  );
+  Future<void> pickImage() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+      withData: true,
+    );
 
-  if (result != null && result.files.isNotEmpty) {
-    setState(() {
-      selectedImage = result.files.first;
-      selectedImageName = selectedImage!.name;
-    });
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        selectedImage = result.files.first;
+        selectedImageName = selectedImage!.name;
+      });
+    }
   }
-}
 
   Future<void> saveNews() async {
     if (titleController.text.trim().isEmpty ||
         contentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Todos los campos obligatorios deben completarse'),
+          content: Text(
+            'Todos los campos obligatorios deben completarse',
+          ),
         ),
       );
       return;
@@ -64,7 +66,7 @@ Future<void> pickImage() async {
       country: selectedCountry,
       content: contentController.text.trim(),
       status: selectedStatus,
-    imageFile: selectedImage,
+      imageFile: selectedImage,
     );
 
     if (!mounted) return;
