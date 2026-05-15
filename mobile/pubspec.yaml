@@ -62,7 +62,12 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/logo_latam1.png   # sin "package:mobile/" adelante
+    - assets/images/logo_latam.png 
+    - assets/images/logo_latam1.png 
+    - assets/images/logo_colombia.png
+    - assets/images/logo_ecuador.png
+    - assets/images/logo_chile.png
+    - assets/images/logo_argentina.png  
   
 
   # To add assets to your application, add an assets section, like this:
