@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile/constants/app_colors.dart';
 import 'package:mobile/login_screen.dart';
 import 'package:mobile/news_screen.dart';
 import 'package:mobile/screens/models/dashboard_item.dart';
 import 'package:mobile/screens/widgets/dashboard_screen/dashboard_card.dart';
 import 'package:mobile/screens/widgets/dashboard_screen/dashboard_header.dart';
-
-
+import 'package:mobile/screens/widgets/dashboard_screen/metric_tile.dart';
+import 'package:mobile/screens/widgets/dashboard_screen/country_card.dart';
+import 'package:mobile/screens/widgets/dashboard_screen/activity_feed.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
+  // ── Logout ───────────────────────────────
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
@@ -25,111 +28,260 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  List<DashboardItem> _dashboardItems(BuildContext context) {
-    return [
-      DashboardItem(
-        title: 'Noticias',
-        subtitle: 'Gestiona noticias del CMS',
-        icon: Icons.article_outlined,
-        onTap: () {
-          Navigator.push(
+  // ── Quick Access Items ───────────────────
+  List<DashboardItem> _quickItems(BuildContext context) => [
+        DashboardItem(
+          title: 'Solicitudes',
+          subtitle: 'Pendientes',
+          icon: Icons.mail_outline_rounded,
+          badgeCount: 12,
+          onTap: () {},
+        ),
+        DashboardItem(
+          title: 'Noticias',
+          subtitle: '58 activas',
+          icon: Icons.article_outlined,
+          onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => const NewsScreen(),
             ),
-          );
-        },
-      ),
+          ),
+        ),
+        DashboardItem(
+          title: 'Testimonios',
+          subtitle: '34 publicados',
+          icon: Icons.star_border_rounded,
+          onTap: () {},
+        ),
+        DashboardItem(
+          title: 'Países',
+          subtitle: '3 portales',
+          icon: Icons.map_outlined,
+          onTap: () {},
+        ),
+      ];
 
-      DashboardItem(
-        title: 'Testimonios',
-        subtitle: 'Administrar testimonios',
-        icon: Icons.record_voice_over_outlined,
-        onTap: () {},
-      ),
+ static const List<CountryData> _countries = [
+  CountryData(
+    flag: '🇨🇴',
+    name: 'Colombia',
+    code: 'CO',
+    pending: 6,
+    news: 28,
+    accentColor: AppColors.countryBorderCo,
+  ),
+  CountryData(
+    flag: '🇨🇱',
+    name: 'Chile',
+    code: 'CL',
+    pending: 3,
+    news: 17,
+    accentColor: AppColors.countryBorderCl,
+  ),
+  CountryData(
+    flag: '🇪🇨',
+    name: 'Ecuador',
+    code: 'EC',
+    pending: 3,
+    news: 13,
+    accentColor: AppColors.countryBorderEc,
+  ),
+];
+  // ── Activity Feed ────────────────────────
+  static const List<ActivityEntry> _activity = [
+    ActivityEntry(
+      text: 'Nueva solicitud de Juan Rodríguez · 🇨🇴',
+      time: '5 min',
+      type: ActivityType.pending,
+    ),
+    ActivityEntry(
+      text: 'Noticia publicada "Edifica 2026" · 🇨🇴',
+      time: '1 h',
+      type: ActivityType.published,
+    ),
+    ActivityEntry(
+      text: 'Testimonio aprobado · Claudia H. · 🇨🇱',
+      time: '2 h',
+      type: ActivityType.testimonial,
+    ),
+    ActivityEntry(
+      text: 'Nueva solicitud de Ana Morales · 🇪🇨',
+      time: '3 h',
+      type: ActivityType.pending,
+    ),
+  ];
 
-      DashboardItem(
-        title: 'Solicitudes',
-        subtitle: 'Revisar formularios',
-        icon: Icons.mail_outline,
-        onTap: () {},
-      ),
-
-      DashboardItem(
-        title: 'Usuarios',
-        subtitle: 'Control de usuarios',
-        icon: Icons.people_outline,
-        onTap: () {},
-      ),
-    ];
-  }
-
+  // ── Build ────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final items = _dashboardItems(context);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-
-      appBar: AppBar(
-        title: const Text('Dashboard CMS'),
-        centerTitle: true,
-        elevation: 0,
+      backgroundColor: AppColors.scaffoldBg,
+      body: Column(
+        children: [
+          const DashboardHeader(
+            userRole: 'Superadmin',
+            country: 'Global',
+          ),
+          Expanded(
+            child: _buildScrollContent(context),
+          ),
+        ],
       ),
+    );
+  }
 
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const DashboardHeader(
-                userRole: 'Superadmin',
-                country: 'Global',
-              ),
+  Widget _buildScrollContent(BuildContext context) {
+    final items = _quickItems(context);
 
-              const SizedBox(height: 24),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Resumen global ──
+          _sectionLabel('Resumen global'),
+          const SizedBox(height: 10),
+          _buildMetrics(),
+          const SizedBox(height: 18),
 
-              Expanded(
-                child: GridView.builder(
-                  itemCount: items.length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.05,
-                  ),
-                  itemBuilder: (context, index) {
-                    return DashboardCard(
-                      item: items[index],
-                    );
-                  },
-                ),
-              ),
+          // ── Acceso rápido ──
+          _sectionLabel('Acceso rápido'),
+          const SizedBox(height: 10),
+          _buildQuickGrid(items),
+          const SizedBox(height: 18),
 
-              const SizedBox(height: 8),
+          // ── Por país ──
+          _sectionLabel('Por país'),
+          const SizedBox(height: 10),
+          ..._countries.map(
+            (country) => CountryCard(data: country),
+          ),
+          const SizedBox(height: 8),
 
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton.icon(
-                  onPressed: () => _logout(context),
-                  icon: const Icon(Icons.logout),
-                  label: const Text(
-                    'Cerrar sesión',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          // ── Actividad reciente ──
+          _sectionLabel('Actividad reciente'),
+          const SizedBox(height: 10),
+          const ActivityFeed(
+            entries: _activity,
+          ),
+          const SizedBox(height: 18),
+
+          // ── Logout ──
+          _buildLogoutButton(context),
+        ],
+      ),
+    );
+  }
+
+  // ── Helpers ──────────────────────────────
+
+  Widget _sectionLabel(String text) {
+    return Row(
+      children: [
+        Text(
+          text.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: AppColors.primary,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Container(
+            height: 0.5,
+            color: AppColors.fieldBorder,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetrics() {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      childAspectRatio: 1.1,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: const [
+        MetricTile(
+          icon: Icons.mail_outline_rounded,
+          value: '12',
+          label: 'Solicitudes pendientes',
+          dark: true,
+        ),
+        MetricTile(
+          icon: Icons.star_border_rounded,
+          value: '34',
+          label: 'Testimonios publicados',
+        ),
+        MetricTile(
+          icon: Icons.article_outlined,
+          value: '58',
+          label: 'Noticias activas',
+        ),
+        MetricTile(
+          icon: Icons.language_rounded,
+          value: '3',
+          label: 'Portales activos',
+          dark: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickGrid(List<DashboardItem> items) {
+    return GridView.builder(
+      itemCount: items.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 1.1,
+      ),
+      itemBuilder: (_, index) {
+        return DashboardCard(
+          item: items[index],
+        );
+      },
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: OutlinedButton.icon(
+        onPressed: () => _logout(context),
+        icon: const Icon(
+          Icons.logout_rounded,
+          size: 18,
+          color: AppColors.primary,
+        ),
+        label: const Text(
+          'Cerrar sesión',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.primary,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(
+            color: AppColors.fieldBorder,
+            width: 1,
+          ),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
       ),

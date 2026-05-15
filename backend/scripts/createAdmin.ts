@@ -1,20 +1,14 @@
-require('dotenv').config();
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import User from '../src/models/User';
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-
-const User = require('../src/models/User');
-
-const createAdmin = async () => {
-
+const createAdmin = async (): Promise<void> => {
   try {
-
-    await mongoose.connect(process.env.MONGO_URI);
-
+    await mongoose.connect(process.env.MONGO_URI as string);
     console.log('Mongo conectado');
 
     const hashedPassword = await bcrypt.hash('123456', 10);
-
     console.log(hashedPassword);
 
     const user = new User({
@@ -26,19 +20,13 @@ const createAdmin = async () => {
     });
 
     await user.save();
-
     console.log('Usuario creado');
-
     process.exit();
 
   } catch (error) {
-
-    console.log(error);
-
+    console.error(error);
     process.exit(1);
-
   }
-
 };
 
 createAdmin();
