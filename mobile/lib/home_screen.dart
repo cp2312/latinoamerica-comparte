@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/login_screen.dart';
 import 'package:mobile/services/news_service.dart';
+import 'package:mobile/services/testimonios_service.dart';
 import 'package:mobile/screens/models/news_model.dart';
+import 'package:mobile/screens/models/testimonio_model.dart';
 import 'package:mobile/screens/widgets/home/home_hero.dart';
 import 'package:mobile/screens/widgets/home/home_news_card.dart';
 import 'package:mobile/screens/widgets/home/home_section_title.dart';
@@ -61,7 +63,7 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 32),
             const HomeSectionTitle(titulo: 'Testimonios de éxito', icono: Icons.format_quote_rounded),
             const SizedBox(height: 12),
-            _TestimonialsSection(),
+            const _TestimonialsSection(),
             const SizedBox(height: 32),
             const _EquipoSection(),
             const SizedBox(height: 32),
@@ -174,20 +176,19 @@ class _ImpactoSection extends StatelessWidget {
     {'numero': '50+',    'label': 'Empresas\naliadas',                      'icono': Icons.business_outlined},
   ];
 
-  // Logo URL → nombre para mostrar debajo si la imagen falla
   static const _empresas = [
-    {'asset': 'assets/images/empresas/alpina.png',       'nombre': 'Alpina'},
-    {'asset': 'assets/images/empresas/amcor.png',        'nombre': 'AMCOR'},
-    {'asset': 'assets/images/empresas/boehringer.png',   'nombre': 'Boehringer'},
-    {'asset': 'assets/images/empresas/brinks.png',       'nombre': 'Brinks'},
-    {'asset': 'assets/images/empresas/cencosud.png',     'nombre': 'Cencosud'},
-    {'asset': 'assets/images/empresas/grupo_exito.png',  'nombre': 'Grupo Éxito'},
-    {'asset': 'assets/images/empresas/grupo_nutresa.png','nombre': 'Grupo Nutresa'},
-    {'asset': 'assets/images/empresas/sodimac.png',      'nombre': 'Sodimac'},
-    {'asset': 'assets/images/empresas/jm_tracking.png',  'nombre': 'JM Tracking'},
-    {'asset': 'assets/images/empresas/soenergy.png',     'nombre': 'SoEnergy'},
-    {'asset': 'assets/images/empresas/olimpia_it.png',   'nombre': 'Olimpia IT'},
-    {'asset': 'assets/images/empresas/sanfer.png',       'nombre': 'Sanfer'},
+    {'asset': 'assets/images/empresas/alpina.png',        'nombre': 'Alpina'},
+    {'asset': 'assets/images/empresas/amcor.png',         'nombre': 'AMCOR'},
+    {'asset': 'assets/images/empresas/boehringer.png',    'nombre': 'Boehringer'},
+    {'asset': 'assets/images/empresas/brinks.png',        'nombre': 'Brinks'},
+    {'asset': 'assets/images/empresas/cencosud.png',      'nombre': 'Cencosud'},
+    {'asset': 'assets/images/empresas/grupo_exito.png',   'nombre': 'Grupo Éxito'},
+    {'asset': 'assets/images/empresas/grupo_nutresa.png', 'nombre': 'Grupo Nutresa'},
+    {'asset': 'assets/images/empresas/sodimac.png',       'nombre': 'Sodimac'},
+    {'asset': 'assets/images/empresas/jm_tracking.png',   'nombre': 'JM Tracking'},
+    {'asset': 'assets/images/empresas/soenergy.png',      'nombre': 'SoEnergy'},
+    {'asset': 'assets/images/empresas/olimpia_it.png',    'nombre': 'Olimpia IT'},
+    {'asset': 'assets/images/empresas/sanfer.png',        'nombre': 'Sanfer'},
   ];
 
   @override
@@ -198,7 +199,6 @@ class _ImpactoSection extends StatelessWidget {
         const HomeSectionTitle(titulo: 'Nuestro impacto', icono: Icons.bar_chart_outlined),
         const SizedBox(height: 16),
 
-        // ── Cifras ────────────────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: GridView.count(
@@ -218,7 +218,6 @@ class _ImpactoSection extends StatelessWidget {
 
         const SizedBox(height: 28),
 
-        // ── Empresas que comparten — carrusel ─────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
@@ -239,7 +238,6 @@ class _ImpactoSection extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        // Carrusel horizontal de logos
         SizedBox(
           height: 110,
           child: ListView.builder(
@@ -248,10 +246,7 @@ class _ImpactoSection extends StatelessWidget {
             itemCount: _empresas.length,
             itemBuilder: (context, index) {
               final e = _empresas[index];
-              return _EmpresaCard(
-                asset:  e['asset']!,
-                nombre: e['nombre']!,
-              );
+              return _EmpresaCard(asset: e['asset']!, nombre: e['nombre']!);
             },
           ),
         ),
@@ -275,11 +270,7 @@ class _EmpresaCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.07),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 10, offset: const Offset(0, 3)),
         ],
       ),
       child: Column(
@@ -493,29 +484,49 @@ class _NewsSection extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// TESTIMONIOS
+// TESTIMONIOS — datos reales desde la API
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _TestimonialsSection extends StatelessWidget {
-  static const _testimonios = [
-    {'nombre': 'María González', 'pais': 'Colombia', 'texto': 'Gracias al programa Edifica pude emprender mi negocio y recuperar la estabilidad de mi familia.'},
-    {'nombre': 'Carlos Rojas',   'pais': 'Chile',    'texto': 'El programa Nodus me dio las herramientas para liderar mi empresa con visión y propósito.'},
-    {'nombre': 'Ana Torres',     'pais': 'Ecuador',  'texto': 'No imaginé que en tan poco tiempo lograría estabilizar mis ingresos. Latinoamérica Comparte cambió mi vida.'},
-  ];
+  const _TestimonialsSection();
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 190,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: _testimonios.length,
-        itemBuilder: (context, index) {
-          final t = _testimonios[index];
-          return HomeTestimonialCard(nombre: t['nombre']!, pais: t['pais']!, texto: t['texto']!);
-        },
-      ),
+    return FutureBuilder<List<TestimonioModel>>(
+      future: TestimoniosService().getTestimoniosPublicos(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: CircularProgressIndicator(color: Color(0xFF6A0080)),
+            ),
+          );
+        }
+
+        final testimonios = snapshot.data ?? [];
+        if (testimonios.isEmpty) {
+          return const _EmptyState(mensaje: 'No hay testimonios publicados aún');
+        }
+
+        return SizedBox(
+          height: 190,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: testimonios.length,
+            itemBuilder: (context, index) {
+              final t = testimonios[index];
+              return HomeTestimonialCard(
+                nombre:  t.nombre,
+                pais:    t.pais,
+                texto:   t.testimonio,
+                fotoUrl: t.fotoUrl,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
