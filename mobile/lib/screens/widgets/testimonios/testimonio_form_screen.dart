@@ -33,10 +33,11 @@ class _TestimonioFormScreenState extends State<TestimonioFormScreen> {
 
   // Países igual que el backend los guarda: en minúscula
   static const _paises = [
-    ('colombia', '🇨🇴  Colombia'),
-    ('chile',    '🇨🇱  Chile'),
-    ('ecuador',  '🇪🇨  Ecuador'),
-  ];
+  ('colombia',  '🇨🇴  Colombia'),
+  ('chile',     '🇨🇱  Chile'),
+  ('ecuador',   '🇪🇨  Ecuador'),
+  ('argentina', '🇦🇷  Argentina'),
+];
 
   @override
   void initState() {

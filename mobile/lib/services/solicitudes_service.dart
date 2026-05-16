@@ -2,6 +2,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ── Clase resultado de envío ──────────────────────────────────────────────────
+
+class RespuestaEnvio {
+  final bool   ok;
+  final String mensaje;
+  RespuestaEnvio({required this.ok, required this.mensaje});
+}
+
+
 // ── Modelo ────────────────────────────────────────────────────────────────────
 
 class SolicitudModel {
@@ -36,21 +45,14 @@ class SolicitudModel {
 
   String get fechaFormateada {
     if (createdAt == null) return '';
-    try {
-      return createdAt!.substring(0, 10); // YYYY-MM-DD
-    } catch (_) {
-      return '';
-    }
+    try { return createdAt!.substring(0, 10); } catch (_) { return ''; }
   }
 }
 
 // ── Servicio ──────────────────────────────────────────────────────────────────
 
 class SolicitudesService {
-  // Flutter Web → localhost | Emulador Android → 10.0.2.2
   static const String _baseUrl = 'http://localhost:3000';
-
-  // ── Headers con token ──────────────────────────────────────────────────────
 
   Future<Map<String, String>> _authHeaders() async {
     final prefs = await SharedPreferences.getInstance();
@@ -61,10 +63,7 @@ class SolicitudesService {
     };
   }
 
-  // ── POST /solicitudes/public — sin login, desde los formularios ────────────
-
-  /// Envía una solicitud desde cualquier formulario público.
-  /// Retorna true si se guardó correctamente.
+  // POST /solicitudes/public
   Future<bool> enviarSolicitudPublica({
     required String nombre,
     required String correo,
@@ -77,26 +76,17 @@ class SolicitudesService {
         Uri.parse('$_baseUrl/solicitudes/public'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'nombre':    nombre,
-          'correo':    correo,
-          'telefono':  telefono,
-          'finalidad': finalidad,
-          'pais':      pais,
+          'nombre': nombre, 'correo': correo, 'telefono': telefono,
+          'finalidad': finalidad, 'pais': pais,
         }),
       );
       return response.statusCode == 201;
-    } catch (_) {
-      return false;
-    }
+    } catch (_) { return false; }
   }
 
-  // ── GET /solicitudes — protegido, para el panel admin ─────────────────────
-
-  /// Trae todas las solicitudes (superadmin ve todas, admin_pais ve las suyas).
-  /// Filtros opcionales: [pais] y [estado].
+  // GET /solicitudes
   Future<List<SolicitudModel>> getSolicitudes({
-    String? pais,
-    String? estado,
+    String? pais, String? estado,
   }) async {
     try {
       String path = '/solicitudes';
@@ -115,13 +105,10 @@ class SolicitudesService {
         return data.map((e) => SolicitudModel.fromJson(e)).toList();
       }
       return [];
-    } catch (_) {
-      return [];
-    }
+    } catch (_) { return []; }
   }
 
-  // ── PATCH /solicitudes/:id/estado ─────────────────────────────────────────
-
+  // PATCH /solicitudes/:id/estado
   Future<bool> cambiarEstado(String id, String estado) async {
     try {
       final response = await http.patch(
@@ -130,13 +117,28 @@ class SolicitudesService {
         body: jsonEncode({'estado': estado}),
       );
       return response.statusCode == 200;
-    } catch (_) {
-      return false;
+    } catch (_) { return false; }
+  }
+
+  // POST /solicitudes/:id/responder — envía correo de respuesta
+  Future<RespuestaEnvio> responder(String id, String mensaje) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/solicitudes/$id/responder'),
+        headers: await _authHeaders(),
+        body: jsonEncode({'mensaje': mensaje}),
+      );
+      if (response.statusCode == 200) {
+        return RespuestaEnvio(ok: true, mensaje: 'Correo enviado correctamente');
+      }
+      final body = jsonDecode(response.body);
+      return RespuestaEnvio(ok: false, mensaje: body['message'] ?? 'Error al enviar');
+    } catch (e) {
+      return RespuestaEnvio(ok: false, mensaje: 'Error de conexión: $e');
     }
   }
 
-  // ── DELETE /solicitudes/:id ───────────────────────────────────────────────
-
+  // DELETE /solicitudes/:id
   Future<bool> eliminar(String id) async {
     try {
       final response = await http.delete(
@@ -144,8 +146,6 @@ class SolicitudesService {
         headers: await _authHeaders(),
       );
       return response.statusCode == 200;
-    } catch (_) {
-      return false;
-    }
+    } catch (_) { return false; }
   }
 }

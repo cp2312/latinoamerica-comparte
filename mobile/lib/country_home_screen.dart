@@ -323,7 +323,7 @@ class CountryHomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: HomeContactCard(paisInicial: config.nombre),
+              child: HomeContactCard(paisInicial: config.nombre, paisFijo: true),
             ),
 
             const SizedBox(height: 40),

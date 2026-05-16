@@ -6,6 +6,7 @@ import {
   getSolicitud,
   createSolicitudPublica,
   cambiarEstadoSolicitud,
+  responderSolicitud,
   deleteSolicitud,
 } from '../controllers/solicitudesController';
 
@@ -33,6 +34,15 @@ router.patch(
   roleMiddleware('superadmin', 'admin_pais'),
   cambiarEstadoSolicitud
 );
+
+// POST /:id/responder — envía correo y marca como respondida
+router.post(
+  '/:id/responder',
+  authMiddleware,
+  roleMiddleware('superadmin', 'admin_pais'),
+  responderSolicitud
+);
+
 router.delete(
   '/:id',
   authMiddleware,

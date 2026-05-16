@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/services/solicitudes_service.dart';
+import 'package:mobile/constants/app_colors.dart';
 
-/// Formulario público de contacto — RF-07 / HU-19.
+/// Formulario público de contacto (RF-07 / HU-19).
 /// No requiere autenticación.
-/// Envía directamente a POST /solicitudes/public en el backend.
-/// [paisInicial] pre-selecciona el país cuando se abre desde
-/// un portal de país específico (Colombia, Chile, Ecuador, Argentina).
+/// [paisInicial] permite pre-seleccionar el país cuando se abre
+/// desde un portal de país específico.
+/// TODO Fase 4: conectar con POST /solicitudes (endpoint público sin JWT).
 class HomeContactCard extends StatefulWidget {
   final String paisInicial;
+  /// Si viene de un portal de país específico, el selector queda bloqueado.
+  final bool   paisFijo;
 
   const HomeContactCard({
     super.key,
     this.paisInicial = 'Colombia',
+    this.paisFijo    = false,
   });
 
   @override
@@ -28,7 +31,6 @@ class _HomeContactCardState extends State<HomeContactCard> {
   late String _paisSeleccionado;
   bool        _enviando = false;
   bool        _enviado  = false;
-  String?     _errorMsg;
 
   static const _paises = ['Colombia', 'Chile', 'Ecuador', 'Argentina'];
 
@@ -47,40 +49,28 @@ class _HomeContactCardState extends State<HomeContactCard> {
     super.dispose();
   }
 
-  // ── Envío real al backend ─────────────────────────────────────────────────
-
   Future<void> _enviar() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _enviando = true;
-      _errorMsg = null;
-    });
+    setState(() => _enviando = true);
 
-    final ok = await SolicitudesService().enviarSolicitudPublica(
-      nombre:    _nombre.text.trim(),
-      correo:    _correo.text.trim(),
-      telefono:  _telefono.text.trim(),
-      finalidad: _finalidad.text.trim(),
-      pais:      _paisSeleccionado,
-    );
+    // TODO Fase 4: llamar API pública
+    // await SolicitudesService().enviarSolicitud(
+    //   nombre:   _nombre.text,
+    //   correo:   _correo.text,
+    //   telefono: _telefono.text,
+    //   finalidad: _finalidad.text,
+    //   pais:     _paisSeleccionado,
+    // );
+
+    await Future.delayed(const Duration(milliseconds: 800));
 
     if (!mounted) return;
-
-    if (ok) {
-      setState(() {
-        _enviando = false;
-        _enviado  = true;
-      });
-    } else {
-      setState(() {
-        _enviando = false;
-        _errorMsg = 'No se pudo enviar la solicitud. Intenta de nuevo.';
-      });
-    }
+    setState(() {
+      _enviando = false;
+      _enviado  = true;
+    });
   }
-
-  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -129,11 +119,11 @@ class _HomeContactCardState extends State<HomeContactCard> {
             const SizedBox(height: 14),
 
             _Campo(
-              controller: _correo,
-              label:      'Correo electrónico',
-              icono:      Icons.mail_outline,
-              teclado:    TextInputType.emailAddress,
-              validator:  (v) {
+              controller:    _correo,
+              label:         'Correo electrónico',
+              icono:         Icons.mail_outline,
+              teclado:       TextInputType.emailAddress,
+              validator: (v) {
                 if (v!.isEmpty) return 'Campo requerido';
                 if (!v.contains('@')) return 'Correo inválido';
                 return null;
@@ -159,51 +149,29 @@ class _HomeContactCardState extends State<HomeContactCard> {
             ),
             const SizedBox(height: 14),
 
-            // ── Selector de país ───────────────────────────────────────
-            DropdownButtonFormField<String>(
-              value: _paisSeleccionado,
-              decoration: InputDecoration(
-                labelText:  'País',
-                prefixIcon: const Icon(Icons.public_outlined),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 14,
-                ),
-              ),
-              items: _paises
-                  .map((p) => DropdownMenuItem(value: p, child: Text(p)))
-                  .toList(),
-              onChanged: (v) => setState(() => _paisSeleccionado = v!),
-            ),
-
-            // ── Error ──────────────────────────────────────────────────
-            if (_errorMsg != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color:        Colors.red.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.error_outline,
-                        color: Colors.red, size: 18),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _errorMsg!,
-                        style: const TextStyle(
-                            color: Colors.red, fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            // ── Selector de país ─────────────────────────────────────────
+// Si paisFijo = true (venimos de un portal de país),
+// mostramos el campo de solo lectura en lugar del dropdown.
+widget.paisFijo
+    ? _CampoPaisFijo(pais: _paisSeleccionado)
+    : DropdownButtonFormField<String>(
+        value: _paisSeleccionado,
+        decoration: InputDecoration(
+          labelText:  'País',
+          prefixIcon: const Icon(Icons.public_outlined),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14, vertical: 14,
+          ),
+        ),
+        items: _paises.map((p) => DropdownMenuItem(
+          value: p,
+          child: Text(p),
+        )).toList(),
+        onChanged: (v) => setState(() => _paisSeleccionado = v!),
+      ),
 
             const SizedBox(height: 22),
 
@@ -221,18 +189,15 @@ class _HomeContactCardState extends State<HomeContactCard> {
                 ),
                 child: _enviando
                     ? const SizedBox(
-                        width:  22,
-                        height: 22,
-                        child:  CircularProgressIndicator(
-                          color:       Colors.white,
-                          strokeWidth: 2,
+                        width: 22, height: 22,
+                        child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2,
                         ),
                       )
                     : const Text(
                         'Enviar solicitud',
                         style: TextStyle(
-                          fontSize:   15,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 15, fontWeight: FontWeight.w600,
                         ),
                       ),
               ),
@@ -252,34 +217,71 @@ class _HomeContactCardState extends State<HomeContactCard> {
       ),
       child: Column(
         children: [
-          const Icon(
-            Icons.check_circle_outline,
-            color: Color(0xFF6A0080),
-            size:  56,
-          ),
+          const Icon(Icons.check_circle_outline,
+              color: Color(0xFF6A0080), size: 56),
           const SizedBox(height: 16),
           const Text(
             '¡Solicitud enviada!',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Nos pondremos en contacto contigo pronto '
-            'desde el equipo de $_paisSeleccionado.',
+            'Nos pondremos en contacto contigo pronto en $_paisSeleccionado.',
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.black54, fontSize: 13),
           ),
           const SizedBox(height: 20),
           TextButton(
-            onPressed: () => setState(() {
-              _enviado = false;
-              _nombre.clear();
-              _correo.clear();
-              _telefono.clear();
-              _finalidad.clear();
-            }),
+            onPressed: () => setState(() => _enviado = false),
             child: const Text('Enviar otra solicitud'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Campo de país fijo (solo lectura) ────────────────────────────────────────
+
+class _CampoPaisFijo extends StatelessWidget {
+  final String pais;
+  const _CampoPaisFijo({required this.pais});
+
+  String get _bandera {
+    switch (pais.toLowerCase()) {
+      case 'colombia':  return '🇨🇴';
+      case 'chile':     return '🇨🇱';
+      case 'ecuador':   return '🇪🇨';
+      case 'argentina': return '🇦🇷';
+      default:          return '🌎';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        color:        const Color(0xFFF9F0FF),
+        borderRadius: BorderRadius.circular(14),
+        border:       Border.all(color: const Color(0xFFCE93D8), width: 1),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.public_outlined, color: Color(0xFF6A0080), size: 20),
+          const SizedBox(width: 12),
+          Text(
+            '$_bandera  $pais',
+            style: const TextStyle(
+              fontSize:   14,
+              fontWeight: FontWeight.w600,
+              color:      Color(0xFF6A0080),
+            ),
+          ),
+          const Spacer(),
+          const Icon(Icons.lock_outline, size: 14, color: Colors.black26),
         ],
       ),
     );
@@ -289,19 +291,19 @@ class _HomeContactCardState extends State<HomeContactCard> {
 // ── Campo reutilizable ────────────────────────────────────────────────────────
 
 class _Campo extends StatelessWidget {
-  final TextEditingController      controller;
-  final String                     label;
-  final IconData                   icono;
-  final TextInputType              teclado;
-  final int                        maxLines;
-  final String? Function(String?)? validator;
+  final TextEditingController        controller;
+  final String                       label;
+  final IconData                     icono;
+  final TextInputType                teclado;
+  final int                          maxLines;
+  final String? Function(String?)?   validator;
 
   const _Campo({
     required this.controller,
     required this.label,
     required this.icono,
-    this.teclado   = TextInputType.text,
-    this.maxLines  = 1,
+    this.teclado  = TextInputType.text,
+    this.maxLines = 1,
     this.validator,
   });
 
@@ -319,8 +321,7 @@ class _Campo extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical:   14,
+          horizontal: 14, vertical: 14,
         ),
       ),
     );

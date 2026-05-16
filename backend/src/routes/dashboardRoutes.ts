@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import authMiddleware from '../middlewares/authMiddleware';
 import roleMiddleware from '../middlewares/roleMiddleware';
-import { getMetricas } from '../controllers/dashboardController';
+import { getMetricas, getActividad } from '../controllers/dashboardController';
 
 const router = Router();
 
-router.get('/metricas', authMiddleware, roleMiddleware('superadmin'), getMetricas);
+router.get('/metricas',  authMiddleware, roleMiddleware('superadmin'), getMetricas);
+router.get('/actividad', authMiddleware, roleMiddleware('superadmin'), getActividad);
 
 export default router;
