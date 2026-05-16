@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:mobile/screens/models/news_model.dart';
 
 class NewsService {
@@ -50,7 +51,6 @@ class NewsService {
   }
 
   // GET → noticias públicas filtradas por país
-  // Usado en los homes de cada país (CountryHomeScreen).
   Future<List<NewsModel>> getPublicNewsByCountry(String pais) async {
     try {
       final encodedPais = Uri.encodeQueryComponent(pais);
@@ -75,28 +75,38 @@ class NewsService {
     required String country,
     required String content,
     required String status,
+    PlatformFile? imageFile,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final response = await http.post(
+      var request = http.MultipartRequest(
+        'POST',
         Uri.parse(baseUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'titulo':    title,
-          'pais':      country,
-          'contenido': content,
-          'estado':    status,
-        }),
       );
 
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['titulo']    = title;
+      request.fields['pais']      = country;
+      request.fields['contenido'] = content;
+      request.fields['estado']    = status;
+
+      if (imageFile != null && imageFile.bytes != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'imagen',
+            imageFile.bytes!,
+            filename: imageFile.name,
+          ),
+        );
+      }
+
+      final response = await request.send();
       return response.statusCode == 201;
     } catch (e) {
-      throw Exception('Error al crear noticia: $e');
+      print(e);
+      return false;
     }
   }
 
@@ -128,7 +138,7 @@ class NewsService {
     required String country,
     required String content,
     required String status,
-    String? imagePath,
+    PlatformFile? imageFile,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -145,9 +155,13 @@ class NewsService {
       request.fields['contenido'] = content;
       request.fields['estado']    = status;
 
-      if (imagePath != null) {
+      if (imageFile != null && imageFile.bytes != null) {
         request.files.add(
-          await http.MultipartFile.fromPath('imagen', imagePath),
+          http.MultipartFile.fromBytes(
+            'imagen',
+            imageFile.bytes!,
+            filename: imageFile.name,
+          ),
         );
       }
 

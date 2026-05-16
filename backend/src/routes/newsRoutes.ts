@@ -1,16 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const upload = require('../config/multer');
-
-const {
+import { Router } from 'express';
+import upload from '../config/multer';
+import {
   createNews,
   getAllNews,
   updateNews,
   deleteNews
-} = require('../controllers/newsController');
+} from '../controllers/newsController';
+import authMiddleware from '../middlewares/authMiddleware';
+import roleMiddleware from '../middlewares/roleMiddleware';
 
-const authMiddleware = require('../middlewares/authMiddleware');
-const roleMiddleware = require('../middlewares/roleMiddleware');
+const router = Router();
 
 router.post(
   '/',
@@ -20,10 +19,8 @@ router.post(
   createNews
 );
 
-router.get(
-  '/',
-  getAllNews
-);
+router.get('/', getAllNews);
+
 router.put(
   '/:id',
   authMiddleware,
@@ -39,4 +36,4 @@ router.delete(
   deleteNews
 );
 
-module.exports = router;
+export default router;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:mobile/country_home_screen.dart';
 
 class HomeHero extends StatelessWidget {
@@ -7,7 +8,7 @@ class HomeHero extends StatelessWidget {
   static const _paises = [
     {'imagen': 'assets/images/logo_colombia.png',  'nombre': 'Colombia',      'ruta': 'colombia'},
     {'imagen': 'assets/images/logo_ecuador.png',   'nombre': 'Ecuador',       'ruta': 'ecuador'},
-    
+    {'imagen': 'assets/images/logo_latam.png',     'nombre': 'Latinoamérica', 'ruta': null},
     {'imagen': 'assets/images/logo_chile.png',     'nombre': 'Chile',         'ruta': 'chile'},
     {'imagen': 'assets/images/logo_argentina.png', 'nombre': 'Argentina',     'ruta': 'argentina'},
   ];
@@ -60,7 +61,10 @@ class HomeHero extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () => launchUrl(
+              Uri.parse('https://www.instagram.com/latinoamericacomparte/'),
+              mode: LaunchMode.externalApplication,
+            ),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
               side: const BorderSide(color: Colors.white54, width: 1.2),

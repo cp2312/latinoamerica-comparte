@@ -1,18 +1,14 @@
-// backend/scripts/resetAdminPais.js
-// Ejecutar: node scripts/resetAdminPais.js
-require('dotenv').config();
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import User, { IUser } from '../src/models/User';
 
-const mongoose = require('mongoose');
-const bcrypt   = require('bcrypt');
-const User     = require('../src/models/User');
-
-const reset = async () => {
+const reset = async (): Promise<void> => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI as string);
     console.log('✅ Mongo conectado');
 
-    // Ver el usuario actual
-    const usuario = await User.findOne({ correo: 'adminpais@test.com' });
+    const usuario = await User.findOne({ correo: 'adminpais@test.com' }) as IUser | null;
 
     if (!usuario) {
       console.log('❌ Usuario adminpais@test.com NO existe en la base de datos');
@@ -26,15 +22,14 @@ const reset = async () => {
     console.log('   pais:  ', usuario.pais);
     console.log('   pass hash:', usuario.password?.substring(0, 20) + '...');
 
-    // Resetear contraseña a 123456
     const nuevaPass = await bcrypt.hash('123456', 10);
     await User.updateOne(
       { correo: 'adminpais@test.com' },
       {
         $set: {
           password: nuevaPass,
-          rol:      'admin_pais',
-          pais:     'Chile',
+          rol: 'admin_pais',
+          pais: 'Chile'
         }
       }
     );
@@ -45,7 +40,7 @@ const reset = async () => {
     process.exit();
 
   } catch (e) {
-    console.error('❌ Error:', e.message);
+    console.error('❌ Error:', (e as Error).message);
     process.exit(1);
   }
 };

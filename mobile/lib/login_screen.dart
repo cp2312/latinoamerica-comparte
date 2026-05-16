@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/services/auth_service.dart';
-import 'package:mobile/constants/app_colors.dart';
-import 'package:mobile/screens/widgets/login/background_layer.dart';
-import 'package:mobile/screens/widgets/login/hero_section.dart';
-import 'package:mobile/screens/widgets/login/form_card.dart';
+import '../services/auth_service.dart';
+import '../constants/app_colors.dart';
+import '../screens/widgets/login/background_layer.dart';
+import '../screens/widgets/login/hero_section.dart';
+import '../screens/widgets/login/form_card.dart';
 import 'package:mobile/dashboard_screen.dart';
 import 'package:mobile/dashboard_admin_pais_screen.dart';
 
+/// Pantalla de login conectada a [AuthService].
+/// Redirige según el rol del usuario autenticado:
+///   superadmin  → DashboardScreen
+///   admin_pais  → DashboardAdminPaisScreen
+///   editor      → DashboardAdminPaisScreen (con opciones limitadas)
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -28,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // ── Login ────────────────────────────────────────────────────────────────────
+  // ── Acciones ─────────────────────────────────────────────────────────────────
 
   Future<void> _onLogin() async {
     final email    = _emailController.text.trim();
@@ -41,7 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final user = await AuthService().login(correo: email, password: password);
+    final user = await AuthService().login(
+      correo:   email,
+      password: password,
+    );
 
     if (!mounted) return;
     setState(() => _isLoading = false);
@@ -85,9 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:          Text(message),
-        backgroundColor:  AppColors.primary,
-        behavior:         SnackBarBehavior.floating,
+        content:         Text(message),
+        backgroundColor: AppColors.primary,
+        behavior:        SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -95,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ── Build ────────────────────────────────────────────────────────────────────
+  // ── Build ─────────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {

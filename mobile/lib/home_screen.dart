@@ -49,36 +49,22 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // ── 1. Hero ──────────────────────────────────────────────────
             const HomeHero(),
             const SizedBox(height: 32),
-
-            // ── 2. Quiénes somos ─────────────────────────────────────────
             const _QuienesSomosSection(),
             const SizedBox(height: 32),
-
-            // ── 3. Nuestro impacto + empresas aliadas ────────────────────
             const _ImpactoSection(),
             const SizedBox(height: 32),
-
-            // ── 4. Noticias ──────────────────────────────────────────────
             const HomeSectionTitle(titulo: 'Últimas noticias', icono: Icons.article_outlined),
             const SizedBox(height: 12),
             _NewsSection(),
             const SizedBox(height: 32),
-
-            // ── 5. Testimonios ───────────────────────────────────────────
             const HomeSectionTitle(titulo: 'Testimonios de éxito', icono: Icons.format_quote_rounded),
             const SizedBox(height: 12),
             _TestimonialsSection(),
             const SizedBox(height: 32),
-
-            // ── 6. Nuestro equipo ────────────────────────────────────────
             const _EquipoSection(),
             const SizedBox(height: 32),
-
-            // ── 7. Contacto ──────────────────────────────────────────────
             const HomeSectionTitle(titulo: 'Contáctanos', icono: Icons.mail_outline),
             const SizedBox(height: 12),
             const Padding(
@@ -94,7 +80,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECCIÓN: QUIÉNES SOMOS
+// QUIÉNES SOMOS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _QuienesSomosSection extends StatelessWidget {
@@ -119,11 +105,8 @@ class _QuienesSomosSection extends StatelessWidget {
             ),
             child: Column(
               children: [
-                // Logo central
                 Image.asset('assets/images/logo_latam.png', height: 70, fit: BoxFit.contain),
                 const SizedBox(height: 20),
-
-                // Texto principal
                 const Text(
                   'En Latinoamérica Comparte creemos que transformar personas es transformar empresas.',
                   textAlign: TextAlign.center,
@@ -142,8 +125,6 @@ class _QuienesSomosSection extends StatelessWidget {
                   style: TextStyle(fontSize: 13, color: Colors.black54, height: 1.7),
                 ),
                 const SizedBox(height: 20),
-
-                // Logos de los 4 países
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -180,40 +161,39 @@ class _LogoPais extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECCIÓN: NUESTRO IMPACTO + EMPRESAS ALIADAS
+// NUESTRO IMPACTO + EMPRESAS ALIADAS (carrusel)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _ImpactoSection extends StatelessWidget {
   const _ImpactoSection();
 
   static const _cifras = [
-    {'numero': '10+',  'label': 'Años de impacto\nsocial y empresarial', 'icono': Icons.calendar_today_outlined},
-    {'numero': '5.000+', 'label': 'Familias\ntransformadas',           'icono': Icons.family_restroom_outlined},
-    {'numero': '2.000+', 'label': 'Emprendimientos\ncreados',           'icono': Icons.storefront_outlined},
-    {'numero': '50+',  'label': 'Empresas\naliadas',                    'icono': Icons.business_outlined},
+    {'numero': '10+',    'label': 'Años de impacto\nsocial y empresarial', 'icono': Icons.calendar_today_outlined},
+    {'numero': '5.000+', 'label': 'Familias\ntransformadas',               'icono': Icons.family_restroom_outlined},
+    {'numero': '2.000+', 'label': 'Emprendimientos\ncreados',               'icono': Icons.storefront_outlined},
+    {'numero': '50+',    'label': 'Empresas\naliadas',                      'icono': Icons.business_outlined},
   ];
 
+  // Logo URL → nombre para mostrar debajo si la imagen falla
   static const _empresas = [
-    'Alpina',
-    'AMCOR',
-    'Boehringer Ingelheim',
-    'Brinks',
-    'Cencosud',
-    'ChampionX',
-    'Grupo Éxito',
-    'Grupo Nutresa',
-    'KANTAR IBOPE',
-    'ECUASAL',
-    'Homecenter Sodimac',
-    'JM Tracking',
-    'SoEnergy',
-    'Olimpia IT',
-    'Sanfer',
+    {'asset': 'assets/images/empresas/alpina.png',       'nombre': 'Alpina'},
+    {'asset': 'assets/images/empresas/amcor.png',        'nombre': 'AMCOR'},
+    {'asset': 'assets/images/empresas/boehringer.png',   'nombre': 'Boehringer'},
+    {'asset': 'assets/images/empresas/brinks.png',       'nombre': 'Brinks'},
+    {'asset': 'assets/images/empresas/cencosud.png',     'nombre': 'Cencosud'},
+    {'asset': 'assets/images/empresas/grupo_exito.png',  'nombre': 'Grupo Éxito'},
+    {'asset': 'assets/images/empresas/grupo_nutresa.png','nombre': 'Grupo Nutresa'},
+    {'asset': 'assets/images/empresas/sodimac.png',      'nombre': 'Sodimac'},
+    {'asset': 'assets/images/empresas/jm_tracking.png',  'nombre': 'JM Tracking'},
+    {'asset': 'assets/images/empresas/soenergy.png',     'nombre': 'SoEnergy'},
+    {'asset': 'assets/images/empresas/olimpia_it.png',   'nombre': 'Olimpia IT'},
+    {'asset': 'assets/images/empresas/sanfer.png',       'nombre': 'Sanfer'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const HomeSectionTitle(titulo: 'Nuestro impacto', icono: Icons.bar_chart_outlined),
         const SizedBox(height: 16),
@@ -230,70 +210,94 @@ class _ImpactoSection extends StatelessWidget {
             childAspectRatio: 1.6,
             children: _cifras.map((c) => _CifraCard(
               numero: c['numero']! as String,
-              label:  c['label']! as String,
-              icono:  c['icono']! as IconData,
+              label:  c['label']!  as String,
+              icono:  c['icono']!  as IconData,
             )).toList(),
           ),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
-        // ── Empresas que comparten ────────────────────────────────────────
+        // ── Empresas que comparten — carrusel ─────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 4)),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Empresas que comparten',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2E2E2E)),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Las empresas que creen en el bienestar y la productividad con propósito hacen parte de esta red.',
-                      style: TextStyle(fontSize: 12, color: Colors.black45, height: 1.5),
-                    ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _empresas.map((e) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF6A0080).withOpacity(0.07),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF6A0080).withOpacity(0.15)),
-                        ),
-                        child: Text(
-                          e,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF6A0080),
-                          ),
-                        ),
-                      )).toList(),
-                    ),
-                  ],
-                ),
+              const Text(
+                'Empresas que comparten',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2E2E2E)),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Las empresas que creen en el bienestar y la productividad con propósito hacen parte de esta red. Gracias a ellas, más familias en Latinoamérica vuelven a creer, crear y prosperar.',
+                style: TextStyle(fontSize: 12, color: Colors.black45, height: 1.5),
               ),
             ],
           ),
         ),
+
+        const SizedBox(height: 16),
+
+        // Carrusel horizontal de logos
+        SizedBox(
+          height: 110,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: _empresas.length,
+            itemBuilder: (context, index) {
+              final e = _empresas[index];
+              return _EmpresaCard(
+                asset:  e['asset']!,
+                nombre: e['nombre']!,
+              );
+            },
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _EmpresaCard extends StatelessWidget {
+  final String asset;
+  final String nombre;
+  const _EmpresaCard({required this.asset, required this.nombre});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 120,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.07),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Image.asset(
+              asset,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Text(
+                nombre,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6A0080)),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -335,24 +339,25 @@ class _CifraCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECCIÓN: NUESTRO EQUIPO
+// NUESTRO EQUIPO
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _EquipoSection extends StatelessWidget {
   const _EquipoSection();
 
   static const _equipo = [
-    {'nombre': 'Carolina Ruiz',       'cargo': 'Cofundadora y CEO'},
-    {'nombre': 'Eduardo Del Castillo','cargo': 'Cofundador y VP Comercial'},
-    {'nombre': 'Marcela Moreno',      'cargo': 'Directora de Relacionamiento'},
-    {'nombre': 'Angie Castañeda',     'cargo': 'Coordinadora Académica Edifica'},
-    {'nombre': 'Mariana Gomez',       'cargo': 'Directora de Mercadeo'},
-    {'nombre': 'Nancy Vivas',         'cargo': 'Directora de Comunicación Digital'},
+    {'nombre': 'Carolina Ruiz',        'cargo': 'Cofundadora y CEO'},
+    {'nombre': 'Eduardo Del Castillo', 'cargo': 'Cofundador y VP Comercial'},
+    {'nombre': 'Marcela Moreno',       'cargo': 'Directora de Relacionamiento'},
+    {'nombre': 'Angie Castañeda',      'cargo': 'Coordinadora Académica Edifica'},
+    {'nombre': 'Mariana Gomez',        'cargo': 'Directora de Mercadeo'},
+    {'nombre': 'Nancy Vivas',          'cargo': 'Directora de Comunicación Digital'},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const HomeSectionTitle(titulo: 'Nuestro equipo', icono: Icons.people_outline),
         const SizedBox(height: 8),
@@ -372,10 +377,7 @@ class _EquipoSection extends StatelessWidget {
             itemCount: _equipo.length,
             itemBuilder: (context, index) {
               final p = _equipo[index];
-              return _IntegranteCard(
-                nombre: p['nombre']!,
-                cargo:  p['cargo']!,
-              );
+              return _IntegranteCard(nombre: p['nombre']!, cargo: p['cargo']!);
             },
           ),
         ),
@@ -389,7 +391,6 @@ class _IntegranteCard extends StatelessWidget {
   final String cargo;
   const _IntegranteCard({required this.nombre, required this.cargo});
 
-  // Iniciales para el avatar
   String get _iniciales {
     final partes = nombre.trim().split(' ');
     if (partes.length >= 2) return '${partes[0][0]}${partes[1][0]}';
@@ -412,7 +413,6 @@ class _IntegranteCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Avatar con iniciales
           Container(
             width: 52,
             height: 52,
@@ -454,7 +454,7 @@ class _IntegranteCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECCIÓN: NOTICIAS
+// NOTICIAS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _NewsSection extends StatelessWidget {
@@ -493,14 +493,14 @@ class _NewsSection extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECCIÓN: TESTIMONIOS
+// TESTIMONIOS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class _TestimonialsSection extends StatelessWidget {
   static const _testimonios = [
-    {'nombre': 'María González', 'pais': 'Colombia',  'texto': 'Gracias al programa Edifica pude emprender mi negocio y recuperar la estabilidad de mi familia.'},
-    {'nombre': 'Carlos Rojas',   'pais': 'Chile',     'texto': 'El programa Nodus me dio las herramientas para liderar mi empresa con visión y propósito.'},
-    {'nombre': 'Ana Torres',     'pais': 'Ecuador',   'texto': 'No imaginé que en tan poco tiempo lograría estabilizar mis ingresos. Latinoamérica Comparte cambió mi vida.'},
+    {'nombre': 'María González', 'pais': 'Colombia', 'texto': 'Gracias al programa Edifica pude emprender mi negocio y recuperar la estabilidad de mi familia.'},
+    {'nombre': 'Carlos Rojas',   'pais': 'Chile',    'texto': 'El programa Nodus me dio las herramientas para liderar mi empresa con visión y propósito.'},
+    {'nombre': 'Ana Torres',     'pais': 'Ecuador',  'texto': 'No imaginé que en tan poco tiempo lograría estabilizar mis ingresos. Latinoamérica Comparte cambió mi vida.'},
   ];
 
   @override
