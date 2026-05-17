@@ -4,7 +4,7 @@ class NewsModel {
   final String country;
   final String content;
   final String status;
-  final String? image;
+  final String image;
 
   NewsModel({
     required this.id,
@@ -12,7 +12,7 @@ class NewsModel {
     required this.country,
     required this.content,
     required this.status,
-    this.image,
+    required this.image,
   });
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,7 @@ class NewsModel {
       country: json['pais'] ?? '',
       content: json['contenido'] ?? '',
       status: json['estado'] ?? '',
-      image: json['imagen'],
+      image: json['imagen'] ?? '',
     );
   }
 }

@@ -456,7 +456,6 @@ class _IntegranteCard extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════════════════════
 // NOTICIAS
 // ═══════════════════════════════════════════════════════════════════════════════
-
 class _NewsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -467,24 +466,38 @@ class _NewsSection extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(color: Color(0xFF6A0080)),
+              child: CircularProgressIndicator(
+                color: Color(0xFF6A0080),
+              ),
             ),
           );
         }
+
         if (snapshot.hasError || snapshot.data == null) {
-          return const _EmptyState(mensaje: 'No se pudieron cargar las noticias');
+          return const _EmptyState(
+            mensaje: 'No se pudieron cargar las noticias',
+          );
         }
+
         final noticias = snapshot.data!;
+
         if (noticias.isEmpty) {
-          return const _EmptyState(mensaje: 'No hay noticias publicadas aún');
+          return const _EmptyState(
+            mensaje: 'No hay noticias publicadas aún',
+          );
         }
+
         return SizedBox(
-          height: 220,
+          height: 300,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             itemCount: noticias.length,
-            itemBuilder: (context, index) => HomeNewsCard(noticia: noticias[index]),
+            itemBuilder: (context, index) {
+              return HomeNewsCard(
+                noticia: noticias[index],
+              );
+            },
           ),
         );
       },
