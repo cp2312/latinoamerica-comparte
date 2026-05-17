@@ -5,7 +5,10 @@ import { getMetricas, getActividad } from '../controllers/dashboardController';
 
 const router = Router();
 
+// Métricas: solo superadmin
 router.get('/metricas',  authMiddleware, roleMiddleware('superadmin'), getMetricas);
-router.get('/actividad', authMiddleware, roleMiddleware('superadmin'), getActividad);
+
+// Actividad: superadmin, admin_pais y editor pueden consultarla
+router.get('/actividad', authMiddleware, roleMiddleware('superadmin', 'admin_pais', 'editor'), getActividad);
 
 export default router;
