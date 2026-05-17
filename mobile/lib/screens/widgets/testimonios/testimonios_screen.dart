@@ -1,4 +1,7 @@
 // lib/screens/widgets/testimonios/testimonios_screen.dart
+//
+// Funciona para superadmin (sin filtroPais → ve todos los países)
+// y para admin_pais (filtroPais fijado → solo ve su país).
 
 import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
@@ -7,7 +10,11 @@ import 'package:mobile/screens/models/testimonio_model.dart';
 import 'testimonio_form_screen.dart';
 
 class TestimoniosScreen extends StatefulWidget {
-  const TestimoniosScreen({super.key});
+  /// null → superadmin ve todos los países.
+  /// no-null → admin_pais fija el país y no puede cambiarlo.
+  final String? filtroPais;
+
+  const TestimoniosScreen({super.key, this.filtroPais});
 
   @override
   State<TestimoniosScreen> createState() => _TestimoniosScreenState();
@@ -20,6 +27,8 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
   bool                  _cargando = true;
   String                _filtro   = '';
 
+  String? get _paisFijo => widget.filtroPais;
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +38,7 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
   Future<void> _cargar() async {
     setState(() => _cargando = true);
     final data = await _service.getTestimonios(
+      pais:   _paisFijo,                              // fija si es admin_pais
       estado: _filtro.isEmpty ? null : _filtro,
     );
     if (!mounted) return;
@@ -36,12 +46,13 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
   }
 
   Color _colorEstado(String e) => switch (e) {
-        'publicado'    => const Color(0xFF10B981),
-        'despublicado' => const Color(0xFFEF4444),
-        _              => const Color(0xFF9CA3AF),
-      };
+    'publicado'    => const Color(0xFF10B981),
+    'despublicado' => const Color(0xFFEF4444),
+    _              => const Color(0xFF9CA3AF),
+  };
 
-  // ── Toggle publicado/despublicado ──────────────────────────────────────────
+  // ── Toggle publicado / despublicado ────────────────────────────────────────
+
   Future<void> _toggleEstado(TestimonioModel t) async {
     final nuevo = t.estado == 'publicado' ? 'despublicado' : 'publicado';
     final ok    = await _service.cambiarEstado(t.id, nuevo);
@@ -50,14 +61,15 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
       _cargar();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('No se pudo cambiar el estado'),
+        content:         Text('No se pudo cambiar el estado'),
         backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
+        behavior:        SnackBarBehavior.floating,
       ));
     }
   }
 
   // ── Eliminar ───────────────────────────────────────────────────────────────
+
   Future<void> _confirmarEliminar(TestimonioModel t) async {
     final ok = await showDialog<bool>(
       context: context,
@@ -73,7 +85,8 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
               child: const Text('Cancelar')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Eliminar'),
           ),
@@ -83,54 +96,58 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
     if (ok != true || !mounted) return;
     final eliminado = await _service.eliminarTestimonio(t.id);
     if (!mounted) return;
-    if (eliminado) {
-      _cargar();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Testimonio eliminado'),
-        backgroundColor: Color(0xFF10B981),
-        behavior: SnackBarBehavior.floating,
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('No se pudo eliminar el testimonio'),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ));
-    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(eliminado
+          ? 'Testimonio eliminado'
+          : 'No se pudo eliminar el testimonio'),
+      backgroundColor: eliminado ? const Color(0xFF10B981) : Colors.red,
+      behavior:        SnackBarBehavior.floating,
+    ));
+    if (eliminado) _cargar();
   }
 
-  // ── Navegar al formulario ──────────────────────────────────────────────────
+  // ── Ir al formulario ───────────────────────────────────────────────────────
+
   Future<void> _irFormulario({TestimonioModel? testimonio}) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (_) =>
-              TestimonioFormScreen(testimonioExistente: testimonio)),
+        builder: (_) => TestimonioFormScreen(
+          testimonioExistente: testimonio,
+          // Si hay filtroPais, pre-selecciona el país y lo bloquea
+          paisForzado: _paisFijo,
+        ),
+      ),
     );
     _cargar();
   }
 
   // ── Build ──────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
+    final titulo = _paisFijo != null
+        ? 'Testimonios · $_paisFijo'
+        : 'Testimonios de Éxito';
+
     return Scaffold(
       backgroundColor: const Color(0xFFFDF5F8),
       appBar: AppBar(
         backgroundColor: AppColors.heroBottom,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text('Testimonios de Éxito',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+        title: Text(titulo,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
         actions: [
           IconButton(
               icon: const Icon(Icons.refresh_rounded), onPressed: _cargar),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _irFormulario(),
+        onPressed:       () => _irFormulario(),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
+        icon:            const Icon(Icons.add_rounded),
         label: const Text('Nuevo',
             style: TextStyle(fontWeight: FontWeight.w600)),
       ),
@@ -142,6 +159,7 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
   }
 
   // ── Filtros ────────────────────────────────────────────────────────────────
+
   Widget _buildFiltros() {
     const chips = [
       ('',             'Todos'),
@@ -154,8 +172,10 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(children: [
         const Text('Estado:',
-            style: TextStyle(fontWeight: FontWeight.w600,
-                color: AppColors.fieldText, fontSize: 12)),
+            style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color:      AppColors.fieldText,
+                fontSize:   12)),
         const SizedBox(width: 10),
         Expanded(
           child: SingleChildScrollView(
@@ -169,10 +189,10 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
                     label: Text(c.$2,
                         style: TextStyle(
                             color: sel ? Colors.white : AppColors.fieldText,
-                            fontSize: 12,
+                            fontSize:   12,
                             fontWeight: FontWeight.w500)),
-                    selected: sel,
-                    selectedColor: AppColors.primary,
+                    selected:        sel,
+                    selectedColor:   AppColors.primary,
                     backgroundColor: AppColors.fieldBg,
                     onSelected: (_) {
                       setState(() => _filtro = c.$1);
@@ -189,6 +209,7 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
   }
 
   // ── Lista ──────────────────────────────────────────────────────────────────
+
   Widget _buildBody() {
     if (_cargando) {
       return const Center(
@@ -203,30 +224,30 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
           Text(
             'No hay testimonios'
             '${_filtro.isNotEmpty ? ' con estado "$_filtro"' : ''}',
-            style: const TextStyle(
-                color: AppColors.fieldLabel, fontSize: 14),
+            style: const TextStyle(color: AppColors.fieldLabel, fontSize: 14),
           ),
         ]),
       );
     }
     return RefreshIndicator(
-      color: AppColors.primary,
+      color:     AppColors.primary,
       onRefresh: _cargar,
       child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
-        itemCount: _items.length,
+        padding:     const EdgeInsets.fromLTRB(16, 16, 16, 90),
+        itemCount:   _items.length,
         itemBuilder: (_, i) => _buildCard(_items[i]),
       ),
     );
   }
 
   // ── Card ───────────────────────────────────────────────────────────────────
+
   Widget _buildCard(TestimonioModel t) {
     final color = _colorEstado(t.estado);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:        Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.fieldBorder, width: 0.5),
         boxShadow: [
@@ -240,7 +261,7 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // ── Foto / Avatar ────────────────────────────────────────────────
+          // Foto / Avatar
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: (t.fotoUrl != null && t.fotoUrl!.isNotEmpty)
@@ -251,7 +272,7 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
           ),
           const SizedBox(width: 12),
 
-          // ── Info ─────────────────────────────────────────────────────────
+          // Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,29 +280,30 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
                 Text(t.nombre,
                     style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: AppColors.fieldText)),
+                        fontSize:   14,
+                        color:      AppColors.fieldText)),
                 const SizedBox(height: 2),
                 Text('${t.bandera}  ${t.pais}',
                     style: const TextStyle(
                         fontSize: 11, color: AppColors.fieldLabel)),
                 const SizedBox(height: 6),
-                // Badge + botón toggle
                 Row(children: [
+                  // Badge estado
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.10),
+                      color:        color.withOpacity(0.10),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(t.estado.toUpperCase(),
                         style: TextStyle(
-                            color: color,
-                            fontSize: 9,
+                            color:      color,
+                            fontSize:   9,
                             fontWeight: FontWeight.w700)),
                   ),
                   const SizedBox(width: 8),
+                  // Botón toggle
                   GestureDetector(
                     onTap: () => _toggleEstado(t),
                     child: Container(
@@ -303,7 +325,7 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
                             ? '↓ Despublicar'
                             : '↑ Publicar',
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize:   10,
                           fontWeight: FontWeight.w600,
                           color: t.estado == 'publicado'
                               ? const Color(0xFFF59E0B)
@@ -317,21 +339,21 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
             ),
           ),
 
-          // ── Acciones ─────────────────────────────────────────────────────
+          // Acciones
           Column(children: [
             IconButton(
               icon: const Icon(Icons.edit_outlined,
                   size: 20, color: AppColors.primary),
-              onPressed: () => _irFormulario(testimonio: t),
-              padding: EdgeInsets.zero,
+              onPressed:   () => _irFormulario(testimonio: t),
+              padding:     EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
             const SizedBox(height: 10),
             IconButton(
               icon: const Icon(Icons.delete_outline_rounded,
                   size: 20, color: Color(0xFFEF4444)),
-              onPressed: () => _confirmarEliminar(t),
-              padding: EdgeInsets.zero,
+              onPressed:   () => _confirmarEliminar(t),
+              padding:     EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
           ]),
@@ -343,16 +365,16 @@ class _TestimoniosScreenState extends State<TestimoniosScreen> {
   Widget _avatar(TestimonioModel t) => Container(
         width: 54, height: 54,
         decoration: BoxDecoration(
-          color: AppColors.fieldBg,
+          color:        AppColors.fieldBg,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(
             t.nombre.isNotEmpty ? t.nombre[0].toUpperCase() : '?',
             style: const TextStyle(
-                color: AppColors.primary,
+                color:      AppColors.primary,
                 fontWeight: FontWeight.w800,
-                fontSize: 22),
+                fontSize:   22),
           ),
         ),
       );

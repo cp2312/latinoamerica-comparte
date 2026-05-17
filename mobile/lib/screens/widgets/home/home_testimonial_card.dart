@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class HomeTestimonialCard extends StatelessWidget {
-  final String nombre;
-  final String pais;
-  final String texto;
+  final String  nombre;
+  final String  pais;
+  final String  texto;
+  final String? fotoUrl; // ← nuevo
 
   const HomeTestimonialCard({
     super.key,
     required this.nombre,
     required this.pais,
     required this.texto,
+    this.fotoUrl,
   });
 
   String get _bandera {
@@ -42,7 +44,7 @@ class HomeTestimonialCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Comillas decorativas ────────────────────────────────────
+          // ── Comillas decorativas ──────────────────────────────────
           const Icon(
             Icons.format_quote_rounded,
             color: Color(0xFF9C27B0),
@@ -51,7 +53,7 @@ class HomeTestimonialCard extends StatelessWidget {
 
           const SizedBox(height: 6),
 
-          // ── Texto ───────────────────────────────────────────────────
+          // ── Texto ─────────────────────────────────────────────────
           Expanded(
             child: Text(
               texto,
@@ -67,21 +69,10 @@ class HomeTestimonialCard extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // ── Autor ───────────────────────────────────────────────────
+          // ── Autor con foto ────────────────────────────────────────
           Row(
             children: [
-              CircleAvatar(
-                radius:          16,
-                backgroundColor: const Color(0xFF9C27B0).withOpacity(0.15),
-                child: Text(
-                  nombre.substring(0, 1),
-                  style: const TextStyle(
-                    color:      Color(0xFF6A0080),
-                    fontWeight: FontWeight.bold,
-                    fontSize:   14,
-                  ),
-                ),
-              ),
+              _Avatar(nombre: nombre, fotoUrl: fotoUrl),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
@@ -107,6 +98,41 @@ class HomeTestimonialCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Avatar: muestra foto si existe, inicial si no ─────────────────────────────
+class _Avatar extends StatelessWidget {
+  final String  nombre;
+  final String? fotoUrl;
+  const _Avatar({required this.nombre, this.fotoUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final tieneUrl = fotoUrl != null && fotoUrl!.isNotEmpty;
+
+    if (tieneUrl) {
+      return CircleAvatar(
+        radius:           20,
+        backgroundColor:  const Color(0xFF9C27B0),
+        backgroundImage:  NetworkImage(fotoUrl!),
+        onBackgroundImageError: (_, __) {},
+        child: null,
+      );
+    }
+
+    return CircleAvatar(
+      radius:          20,
+      backgroundColor: const Color(0xFF9C27B0).withOpacity(0.15),
+      child: Text(
+        nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
+        style: const TextStyle(
+          color:      Color(0xFF6A0080),
+          fontWeight: FontWeight.bold,
+          fontSize:   14,
+        ),
       ),
     );
   }

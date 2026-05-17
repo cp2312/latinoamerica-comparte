@@ -1,5 +1,4 @@
 // lib/services/testimonios_service.dart
-// Consume exactamente las rutas definidas en backend/src/routes/testimoniosRoutes.ts
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -7,8 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mobile/screens/models/testimonio_model.dart';
 
 class TestimoniosService {
-  // Igual que AuthService y NewsService: usa localhost para Flutter Web
-  // y 10.0.2.2 si corres en emulador Android.
   static const String _baseUrl = 'http://localhost:3000';
 
   // ── Headers con JWT ────────────────────────────────────────────────────────
@@ -21,7 +18,7 @@ class TestimoniosService {
     };
   }
 
-  // ── GET /testimonios ───────────────────────────────────────────────────────
+  // ── GET /testimonios — con JWT (admin) ─────────────────────────────────────
   Future<List<TestimonioModel>> getTestimonios({
     String? pais,
     String? estado,
@@ -34,6 +31,25 @@ class TestimoniosService {
       final uri  = Uri.parse('$_baseUrl/testimonios$qs');
 
       final res = await http.get(uri, headers: await _authHeaders());
+      if (res.statusCode == 200) {
+        final List data = jsonDecode(res.body);
+        return data.map((e) => TestimonioModel.fromJson(e)).toList();
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  // ── GET /testimonios/publicos — sin JWT, solo publicados ──────────────────
+  Future<List<TestimonioModel>> getTestimoniosPublicos({String? pais}) async {
+    try {
+      final params = <String>[];
+      if (pais != null && pais.isNotEmpty) params.add('pais=$pais');
+      final qs  = params.isEmpty ? '' : '?${params.join('&')}';
+      final uri = Uri.parse('$_baseUrl/testimonios/public$qs');
+
+      final res = await http.get(uri, headers: {'Content-Type': 'application/json'});
       if (res.statusCode == 200) {
         final List data = jsonDecode(res.body);
         return data.map((e) => TestimonioModel.fromJson(e)).toList();

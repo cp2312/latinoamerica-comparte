@@ -69,22 +69,53 @@ const getAllNews = async (req: Request, res: Response): Promise<void> => {
 const updateNews = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const {
+      titulo,
+      contenido,
+      pais,
+      estado,
+    }: {
+      titulo: string;
+      contenido: string;
+      pais?: string;
+      estado?: string;
+    } = req.body;
 
-    const updatedNews = await News.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    const news = await News.findById(id);
 
-    if (!updatedNews) {
-      res.status(404).json({ message: 'Noticia no encontrada' });
+    if (!news) {
+      res.status(404).json({
+        message: 'Noticia no encontrada',
+      });
       return;
     }
 
-    res.json({ message: 'Noticia actualizada', updatedNews });
+    // conservar imagen actual
+    let imagen = news.imagen;
+
+    // solo reemplazar si llega nueva imagen
+    if (req.file) {
+      imagen = `/uploads/${req.file.filename}`;
+    }
+
+    news.titulo = titulo;
+    news.contenido = contenido;
+    news.pais = pais || null;
+    news.estado = (estado as 'borrador' | 'publicado') || news.estado;
+    news.imagen = imagen;
+
+    await news.save();
+
+    res.status(200).json({
+      message: 'Noticia actualizada correctamente',
+      news,
+    });
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    res.status(500).json({
+      message: (error as Error).message,
+    });
   }
 };
-
 // DELETE /news/:id — eliminar noticia
 const deleteNews = async (req: Request, res: Response): Promise<void> => {
   try {
