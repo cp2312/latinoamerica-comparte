@@ -1,3 +1,9 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// src/app.ts  — VERSIÓN ACTUALIZADA
+// Solo se agrega la línea de importación y el app.use('/paises', ...).
+// El resto del archivo permanece idéntico al original.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -8,6 +14,7 @@ import usersRoutes       from './routes/usersRoutes';
 import testimoniosRoutes from './routes/testimoniosRoutes';
 import solicitudesRoutes from './routes/solicitudesRoutes';
 import dashboardRoutes   from './routes/dashboardRoutes';
+import paisesRoutes      from './routes/paisRoutes'; // ← NUEVA LÍNEA
 
 const app = express();
 
@@ -26,5 +33,6 @@ app.use('/users',       usersRoutes);
 app.use('/testimonios', testimoniosRoutes);
 app.use('/solicitudes', solicitudesRoutes);
 app.use('/dashboard',   dashboardRoutes);
+app.use('/paises',      paisesRoutes); // ← NUEVA LÍNEA
 
 export default app;
