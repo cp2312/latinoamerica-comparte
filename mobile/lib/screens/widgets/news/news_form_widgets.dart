@@ -12,6 +12,7 @@ class NewsFormField extends StatelessWidget {
     this.keyboardType,
     this.validator,
     this.hint,
+    this.enabled = true,
   });
 
   final String label;
@@ -21,6 +22,7 @@ class NewsFormField extends StatelessWidget {
   final TextInputType? keyboardType;
   final FormFieldValidator<String>? validator;
   final String? hint;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {

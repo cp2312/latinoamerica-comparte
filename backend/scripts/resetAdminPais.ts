@@ -29,7 +29,7 @@ const reset = async (): Promise<void> => {
         $set: {
           password: nuevaPass,
           rol: 'admin_pais',
-          pais: 'Chile'
+          pais: 'chile'
         }
       }
     );

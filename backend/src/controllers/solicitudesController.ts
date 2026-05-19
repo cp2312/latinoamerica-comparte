@@ -23,7 +23,7 @@ const registrarActividad = async (
   usuario: string
 ) => {
   try {
-    await Actividad.create({ tipo, accion, texto, pais, usuario });
+    await Actividad.create({ tipo, accion, texto, pais: pais.toLowerCase(), usuario });
   } catch (_) {}
 };
 

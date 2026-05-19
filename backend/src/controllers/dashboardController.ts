@@ -6,16 +6,13 @@ import Actividad  from '../models/Actividad';
 
 const PAISES = ['Colombia', 'Chile', 'Ecuador', 'Argentina'] as const;
 
-// GET /dashboard/metricas — solo superadmin
+// GET /dashboard/metricas
 const getMetricas = async (_req: Request, res: Response): Promise<void> => {
   try {
     const [
-      totalNoticias,
-      noticiasActivas,
-      totalTestimonios,
-      testimoniosPublicados,
-      totalSolicitudes,
-      solicitudesPendientes,
+      totalNoticias, noticiasActivas,
+      totalTestimonios, testimoniosPublicados,
+      totalSolicitudes, solicitudesPendientes,
     ] = await Promise.all([
       News.countDocuments(),
       News.countDocuments({ estado: 'publicado' }),
@@ -43,12 +40,9 @@ const getMetricas = async (_req: Request, res: Response): Promise<void> => {
 
     res.json({
       globales: {
-        totalNoticias,
-        noticiasActivas,
-        totalTestimonios,
-        testimoniosPublicados,
-        totalSolicitudes,
-        solicitudesPendientes,
+        totalNoticias, noticiasActivas,
+        totalTestimonios, testimoniosPublicados,
+        totalSolicitudes, solicitudesPendientes,
       },
       solicitudesPorPais,
       noticiasPorPais,
@@ -58,10 +52,17 @@ const getMetricas = async (_req: Request, res: Response): Promise<void> => {
   }
 };
 
-// GET /dashboard/actividad — últimas 20 acciones reales
-const getActividad = async (_req: Request, res: Response): Promise<void> => {
+// GET /dashboard/actividad — filtra por ?pais= si viene, ambas variantes de capitalización
+const getActividad = async (req: Request, res: Response): Promise<void> => {
   try {
-    const actividad = await Actividad.find()
+    const filtro: Record<string, unknown> = {};
+
+    if (req.query.pais) {
+      // Acepta "chile", "Chile", "CHILE" — busca en minúscula siempre
+      filtro.pais = (req.query.pais as string).toLowerCase();
+    }
+
+    const actividad = await Actividad.find(filtro)
       .sort({ fecha: -1 })
       .limit(20)
       .lean();
