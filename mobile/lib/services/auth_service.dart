@@ -10,44 +10,50 @@ class AuthService {
   // ── Login ────────────────────────────────────────────────────────────────────
 
   /// Retorna [UserModel] si el login fue exitoso, o null si falló.
-  Future<UserModel?> login({
-    required String correo,
-    required String password,
-  }) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body:    jsonEncode({'correo': correo, 'password': password}),
-      );
+Future<Map<String, dynamic>> login({
+  required String correo,
+  required String password,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body:    jsonEncode({'correo': correo, 'password': password}),
+    );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
+    // ✅ Login exitoso
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-        // Guardar token
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', data['token'] as String);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', data['token'] as String);
 
-        // Construir el modelo de usuario desde la respuesta
-        final user = UserModel.fromJson(
-          data['user'] as Map<String, dynamic>,
-        );
+      final user = UserModel.fromJson(data['user'] as Map<String, dynamic>);
+      await prefs.setString('user_rol',    user.rol);
+      await prefs.setString('user_nombre', user.nombre);
+      if (user.pais != null) await prefs.setString('user_pais', user.pais!);
 
-        // Persistir datos de sesión
-        await prefs.setString('user_rol',    user.rol);
-        await prefs.setString('user_nombre', user.nombre);
-        if (user.pais != null) {
-          await prefs.setString('user_pais', user.pais!);
-        }
-
-        return user;
-      }
-
-      return null;
-    } catch (_) {
-      return null;
+      // ✅ Retorna el UserModel dentro del mapa para que login_screen lo use
+      return {'error': false, 'user': user};
     }
+
+    // ✅ País en mantenimiento — el backend mandó 403 con codigo: PAIS_INACTIVO
+    if (response.statusCode == 403) {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      return {
+        'error':   true,
+        'message': body['message'] ?? 'Acceso denegado',
+        'codigo':  body['codigo']  ?? '',
+      };
+    }
+
+    // Credenciales incorrectas u otro error del servidor
+    return {'error': true, 'message': 'Credenciales incorrectas', 'codigo': ''};
+
+  } catch (_) {
+    return {'error': true, 'message': 'Error de conexión', 'codigo': ''};
   }
+}
 
   // ── Logout ───────────────────────────────────────────────────────────────────
 

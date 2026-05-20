@@ -6,6 +6,8 @@ import '../screens/widgets/login/hero_section.dart';
 import '../screens/widgets/login/form_card.dart';
 import 'package:mobile/dashboard_screen.dart';
 import 'package:mobile/dashboard_admin_pais_screen.dart';
+import 'package:mobile/mantenimiento_screen.dart';
+import 'package:mobile/screens/models/user_model.dart';
 
 /// Pantalla de login conectada a [AuthService].
 /// Redirige según el rol del usuario autenticado:
@@ -20,10 +22,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController    = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _isLoading       = false;
+  bool _isLoading = false;
   bool _obscurePassword = true;
 
   @override
@@ -35,53 +37,66 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // ── Acciones ─────────────────────────────────────────────────────────────────
 
-  Future<void> _onLogin() async {
-    final email    = _emailController.text.trim();
-    final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showSnack('Todos los campos son obligatorios');
-      return;
-    }
+Future<void> _onLogin() async {
+  final email    = _emailController.text.trim();
+  final password = _passwordController.text.trim();
 
-    setState(() => _isLoading = true);
-
-    final user = await AuthService().login(
-      correo:   email,
-      password: password,
-    );
-
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-
-    if (user == null) {
-      _showSnack('Credenciales incorrectas');
-      return;
-    }
-
-    // ── Redirige según rol ───────────────────────────────────────────────────
-    switch (user.rol) {
-      case 'superadmin':
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-        );
-        break;
-
-      case 'admin_pais':
-      case 'editor':
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DashboardAdminPaisScreen(usuario: user),
-          ),
-        );
-        break;
-
-      default:
-        _showSnack('Rol no reconocido: ${user.rol}');
-    }
+  if (email.isEmpty || password.isEmpty) {
+    _showSnack('Todos los campos son obligatorios');
+    return;
   }
+
+  setState(() => _isLoading = true);
+
+  final result = await AuthService().login(
+    correo:   email,
+    password: password,
+  );
+
+  if (!mounted) return;
+  setState(() => _isLoading = false);
+
+  // ✅ Manejo de errores
+  if (result['error'] == true) {
+    final codigo = result['codigo'] as String;
+
+    if (codigo == 'PAIS_INACTIVO') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MantenimientoScreen()),
+      );
+    } else {
+      _showSnack(result['message'] ?? 'Error al iniciar sesión');
+    }
+    return;
+  }
+
+  // ✅ Login exitoso — el UserModel viene dentro del mapa
+  final user = result['user'] as UserModel;
+
+  switch (user.rol) {
+    case 'superadmin':
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      );
+      break;
+
+    case 'admin_pais':
+    case 'editor':
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DashboardAdminPaisScreen(usuario: user),
+        ),
+      );
+      break;
+
+    default:
+      _showSnack('Rol no reconocido: ${user.rol}');
+  }
+}
 
   void _onTogglePassword() =>
       setState(() => _obscurePassword = !_obscurePassword);
@@ -93,12 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:         Text(message),
+        content: Text(message),
         backgroundColor: AppColors.primary,
-        behavior:        SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -123,7 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: EdgeInsets.zero,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          minHeight: MediaQuery.of(context).size.height -
+          minHeight:
+              MediaQuery.of(context).size.height -
               MediaQuery.of(context).padding.top -
               MediaQuery.of(context).padding.bottom,
         ),
@@ -134,13 +148,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 22),
               Expanded(
                 child: FormCard(
-                  emailController:    _emailController,
+                  emailController: _emailController,
                   passwordController: _passwordController,
-                  obscurePassword:    _obscurePassword,
-                  isLoading:          _isLoading,
-                  onTogglePassword:   _onTogglePassword,
-                  onLogin:            _onLogin,
-                  onForgotPassword:   _onForgotPassword,
+                  obscurePassword: _obscurePassword,
+                  isLoading: _isLoading,
+                  onTogglePassword: _onTogglePassword,
+                  onLogin: _onLogin,
+                  onForgotPassword: _onForgotPassword,
                 ),
               ),
             ],
