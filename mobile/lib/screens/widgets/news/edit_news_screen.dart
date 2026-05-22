@@ -60,16 +60,22 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
     _loadUserData();
   }
 
+  // ─────────────────────────────────────────────
+  // CARGAR DATOS DEL USUARIO
+  // ─────────────────────────────────────────────
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
 
-    setState(() {
-      userRole = prefs.getString('user_rol') ?? '';
-      userCountry = prefs.getString('user_pais') ?? '';
+    final role = prefs.getString('user_rol') ?? '';
+    final country = prefs.getString('user_pais') ?? '';
 
-      // admin-pais → país fijo
-      if (userRole == 'admin-pais') {
-        selectedCountry = userCountry;
+    setState(() {
+      userRole = role;
+      userCountry = country;
+
+      // ADMIN-PAIS → país fijo
+      if (role == 'admin_pais') {
+        selectedCountry = country;
       }
     });
   }
@@ -81,7 +87,9 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
     super.dispose();
   }
 
-  // ── Seleccionar imagen ─────────────────────────
+  // ─────────────────────────────────────────────
+  // SELECCIONAR IMAGEN
+  // ─────────────────────────────────────────────
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -95,7 +103,9 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
     }
   }
 
-  // ── Actualizar noticia ─────────────────────────
+  // ─────────────────────────────────────────────
+  // ACTUALIZAR NOTICIA
+  // ─────────────────────────────────────────────
   Future<void> _updateNews() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -139,10 +149,21 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
     }
   }
 
-  // ── UI ─────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  // UI
+  // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final isAdminPais = userRole == 'admin-pais';
+    // Esperar carga del usuario
+    if (selectedCountry.isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    final isAdminPais = userRole == 'admin_pais';
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBg,
@@ -151,7 +172,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
           NewsFormHero(
             screenTitle: 'Editar Noticia',
             newsTitle: widget.news.title,
-            subtitle: 'Última edición · ${widget.news.country}',
+            subtitle: 'Última edición · $selectedCountry',
           ),
 
           Expanded(
@@ -163,7 +184,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
                 child: Column(
                   children: [
 
-                    /// TÍTULO
+                    // ───────── TÍTULO ─────────
                     NewsFormField(
                       label: 'Título',
                       icon: Icons.title_rounded,
@@ -179,7 +200,9 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
 
                     const SizedBox(height: 14),
 
-                    /// PAÍS
+                    // ───────── PAÍS ─────────
+
+                    // ADMIN-PAIS → bloqueado
                     if (isAdminPais)
                       NewsFormField(
                         label: 'País',
@@ -188,7 +211,10 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
                           text: selectedCountry,
                         ),
                         hint: '',
+                        enabled: false,
                       )
+
+                    // SUPERADMIN → dropdown completo
                     else
                       NewsFormDropdown<String>(
                         label: 'País',
@@ -209,7 +235,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
 
                     const SizedBox(height: 14),
 
-                    /// CONTENIDO
+                    // ───────── CONTENIDO ─────────
                     NewsFormField(
                       label: 'Contenido',
                       icon: Icons.notes_rounded,
@@ -226,7 +252,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
 
                     const SizedBox(height: 14),
 
-                    /// ESTADO
+                    // ───────── ESTADO ─────────
                     NewsFormDropdown<String>(
                       label: 'Estado',
                       icon: Icons.toggle_on_outlined,
@@ -246,14 +272,14 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
 
                     const SizedBox(height: 14),
 
-                    /// IMAGEN
+                    // ───────── IMAGEN ─────────
                     NewsImagePicker(
                       onTap: _pickImage,
                       imageName: selectedImage?.name,
                       label: 'Seleccionar nueva imagen',
                     ),
 
-                    /// IMAGEN ACTUAL
+                    // ───────── IMAGEN ACTUAL ─────────
                     if (selectedImage == null &&
                         widget.news.image.isNotEmpty) ...[
                       const SizedBox(height: 12),
@@ -262,7 +288,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
 
                     const SizedBox(height: 22),
 
-                    /// BOTÓN ACTUALIZAR
+                    // ───────── BOTÓN ACTUALIZAR ─────────
                     NewsSubmitButton(
                       label: 'Actualizar Noticia',
                       onPressed: _updateNews,
@@ -271,7 +297,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
 
                     const SizedBox(height: 10),
 
-                    /// BOTÓN CANCELAR
+                    // ───────── BOTÓN CANCELAR ─────────
                     _buildCancelButton(context),
                   ],
                 ),
@@ -283,7 +309,9 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
     );
   }
 
-  // ── Imagen actual ─────────────────────────────
+  // ─────────────────────────────────────────────
+  // IMAGEN ACTUAL
+  // ─────────────────────────────────────────────
   Widget _buildCurrentImage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,7 +363,9 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
     );
   }
 
-  // ── Cancelar ──────────────────────────────────
+  // ─────────────────────────────────────────────
+  // CANCELAR
+  // ─────────────────────────────────────────────
   Widget _buildCancelButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,

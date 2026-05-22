@@ -34,35 +34,27 @@ class _ActividadItem {
 
   String get bandera {
     switch (pais.toLowerCase()) {
-      case 'colombia':
-        return '🇨🇴';
-      case 'chile':
-        return '🇨🇱';
-      case 'ecuador':
-        return '🇪🇨';
-      case 'argentina':
-        return '🇦🇷';
-      default:
-        return '🌎';
+      case 'colombia': return '🇨🇴';
+      case 'chile':    return '🇨🇱';
+      case 'ecuador':  return '🇪🇨';
+      case 'argentina':return '🇦🇷';
+      default:         return '🌎';
     }
   }
 
   String get tiempoRelativo {
     final diff = DateTime.now().difference(fecha);
-    if (diff.inMinutes < 1) return 'ahora';
+    if (diff.inMinutes < 1)  return 'ahora';
     if (diff.inMinutes < 60) return 'hace ${diff.inMinutes} min';
-    if (diff.inHours < 24) return 'hace ${diff.inHours} h';
+    if (diff.inHours < 24)   return 'hace ${diff.inHours} h';
     return 'hace ${diff.inDays} días';
   }
 
   ActivityType get activityType {
     switch (tipo) {
-      case 'solicitud':
-        return ActivityType.pending;
-      case 'testimonio':
-        return ActivityType.testimonial;
-      default:
-        return ActivityType.published;
+      case 'solicitud':  return ActivityType.pending;
+      case 'testimonio': return ActivityType.testimonial;
+      default:           return ActivityType.published;
     }
   }
 }
@@ -104,46 +96,31 @@ class _PaisMetrics {
 
   String get bandera {
     switch (pais.toLowerCase()) {
-      case 'colombia':
-        return '🇨🇴';
-      case 'chile':
-        return '🇨🇱';
-      case 'ecuador':
-        return '🇪🇨';
-      case 'argentina':
-        return '🇦🇷';
-      default:
-        return '🌎';
+      case 'colombia': return '🇨🇴';
+      case 'chile':    return '🇨🇱';
+      case 'ecuador':  return '🇪🇨';
+      case 'argentina':return '🇦🇷';
+      default:         return '🌎';
     }
   }
 
   String get code {
     switch (pais.toLowerCase()) {
-      case 'colombia':
-        return 'CO';
-      case 'chile':
-        return 'CL';
-      case 'ecuador':
-        return 'EC';
-      case 'argentina':
-        return 'AR';
-      default:
-        return '--';
+      case 'colombia': return 'CO';
+      case 'chile':    return 'CL';
+      case 'ecuador':  return 'EC';
+      case 'argentina':return 'AR';
+      default:         return '--';
     }
   }
 
   Color get accentColor {
     switch (pais.toLowerCase()) {
-      case 'colombia':
-        return AppColors.countryBorderCo;
-      case 'chile':
-        return AppColors.countryBorderCl;
-      case 'ecuador':
-        return AppColors.countryBorderEc;
-      case 'argentina':
-        return const Color(0xFF74ACDF);
-      default:
-        return AppColors.primary;
+      case 'colombia': return AppColors.countryBorderCo;
+      case 'chile':    return AppColors.countryBorderCl;
+      case 'ecuador':  return AppColors.countryBorderEc;
+      case 'argentina':return const Color(0xFF74ACDF);
+      default:         return AppColors.primary;
     }
   }
 }
@@ -166,16 +143,16 @@ class _MetricasService {
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       final List solicitudes = json['solicitudesPorPais'] ?? [];
-      final List noticias = json['noticiasPorPais'] ?? [];
+      final List noticias    = json['noticiasPorPais'] ?? [];
       return solicitudes.map<_PaisMetrics>((s) {
         final n = (noticias as List).firstWhere(
           (n) => n['pais'] == s['pais'],
           orElse: () => {'pais': s['pais'], 'activas': 0},
         );
         return _PaisMetrics.fromJson({
-          'pais': s['pais'],
+          'pais':       s['pais'],
           'pendientes': s['pendientes'],
-          'activas': n['activas'],
+          'activas':    n['activas'],
         });
       }).toList();
     }
@@ -193,9 +170,9 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  late Future<List<_ActividadItem>> _actividadFuture;
-  late Future<List<_PaisMetrics>> _metricasFuture;
-  late Future<List<TestimonioModel>> _testimoniosFuture;
+  late Future<List<_ActividadItem>>   _actividadFuture;
+  late Future<List<_PaisMetrics>>     _metricasFuture;
+  late Future<List<TestimonioModel>>  _testimoniosFuture;
 
   @override
   void initState() {
@@ -205,8 +182,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _refresh() {
     setState(() {
-      _actividadFuture = _ActividadService().getActividad();
-      _metricasFuture = _MetricasService().getPorPais();
+      _actividadFuture   = _ActividadService().getActividad();
+      _metricasFuture    = _MetricasService().getPorPais();
       _testimoniosFuture = TestimoniosService().getTestimonios();
     });
   }
@@ -259,7 +236,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const PaisesScreen()),
-      ).then((_) => _refresh()), // igual que los demás items
+      ).then((_) => _refresh()),
     ),
   ];
 
@@ -287,29 +264,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Acceso rápido ─────────────────────────────────────────
             _sectionLabel('Acceso rápido'),
             const SizedBox(height: 10),
             _buildQuickGrid(items),
-            const SizedBox(height: 18),
-            // ── Testimonios ───────────────────────────────────────────
+            const SizedBox(height: 20),
             _sectionLabel('Testimonios'),
             const SizedBox(height: 10),
             _buildTestimonios(),
-            const SizedBox(height: 18),
-
-            // ── Por país ──────────────────────────────────────────────
+            const SizedBox(height: 20),
             _sectionLabel('Por país'),
             const SizedBox(height: 10),
             _buildPorPais(),
-            const SizedBox(height: 8),
-
-            // ── Actividad reciente ────────────────────────────────────
+            const SizedBox(height: 20),
             _sectionLabel('Actividad reciente'),
             const SizedBox(height: 10),
             _buildActivityFeed(),
-            const SizedBox(height: 18),
-
+            const SizedBox(height: 24),
             _buildLogoutButton(context),
           ],
         ),
@@ -317,140 +287,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // ── Testimonios en formato card estilo "Por país" ─────────────────────────
-  Widget _buildTestimonios() {
-    return FutureBuilder<List<TestimonioModel>>(
-      future: _testimoniosFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
-        }
-
-        final testimonios = snapshot.data ?? [];
-        if (testimonios.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.fieldBorder, width: 0.5),
-            ),
-            child: const Row(
-              children: [
-                Icon(
-                  Icons.star_border_rounded,
-                  color: AppColors.fieldBorder,
-                  size: 20,
-                ),
-                SizedBox(width: 10),
-                Text(
-                  'No hay testimonios aún',
-                  style: TextStyle(color: Colors.black45, fontSize: 13),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return Column(
-          children: testimonios.map((t) => _TestimonioCard(t: t)).toList(),
-        );
-      },
-    );
-  }
-
-  // ── Por país ──────────────────────────────────────────────────────────────
-  Widget _buildPorPais() {
-    return FutureBuilder<List<_PaisMetrics>>(
-      future: _metricasFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
-        }
-        final paises = snapshot.data ?? [];
-        if (paises.isEmpty) return const SizedBox.shrink();
-        return Column(
-          children: paises
-              .map(
-                (p) => CountryCard(
-                  data: CountryData(
-                    flag: p.bandera,
-                    name: p.pais,
-                    code: p.code,
-                    pending: p.pendientes,
-                    news: p.noticias,
-                    accentColor: p.accentColor,
-                  ),
-                ),
-              )
-              .toList(),
-        );
-      },
-    );
-  }
-
-  // ── Actividad ─────────────────────────────────────────────────────────────
-  Widget _buildActivityFeed() {
-    return FutureBuilder<List<_ActividadItem>>(
-      future: _actividadFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.fieldBorder, width: 0.5),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
-          );
-        }
-        final actividad = snapshot.data ?? [];
-        if (actividad.isEmpty) {
-          return Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.fieldBorder, width: 0.5),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.history, color: AppColors.fieldBorder, size: 20),
-                SizedBox(width: 10),
-                Text(
-                  'Sin actividad reciente',
-                  style: TextStyle(color: Colors.black45, fontSize: 13),
-                ),
-              ],
-            ),
-          );
-        }
-        final entries = actividad
-            .map(
-              (a) => ActivityEntry(
-                text: '${a.texto}${a.pais.isNotEmpty ? ' · ${a.bandera}' : ''}',
-                time: a.tiempoRelativo,
-                type: a.activityType,
-              ),
-            )
-            .toList();
-        return ActivityFeed(entries: entries);
-      },
-    );
-  }
+  // ── Quick grid ────────────────────────────────────────────────────────────
 
   Widget _buildQuickGrid(List<DashboardItem> items) {
     return GridView.builder(
@@ -467,6 +304,144 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // ── Testimonios ───────────────────────────────────────────────────────────
+
+  Widget _buildTestimonios() {
+    return FutureBuilder<List<TestimonioModel>>(
+      future: _testimoniosFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _loadingCard();
+        }
+        final testimonios = snapshot.data ?? [];
+        if (testimonios.isEmpty) {
+          return _emptyCard(
+            icon: Icons.star_border_rounded,
+            label: 'No hay testimonios aún',
+          );
+        }
+        return Column(
+          children: testimonios.map((t) => _TestimonioCard(t: t)).toList(),
+        );
+      },
+    );
+  }
+
+  // ── Por país ──────────────────────────────────────────────────────────────
+
+  Widget _buildPorPais() {
+    return FutureBuilder<List<_PaisMetrics>>(
+      future: _metricasFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _loadingCard();
+        }
+        final paises = snapshot.data ?? [];
+        if (paises.isEmpty) return const SizedBox.shrink();
+        return Column(
+          children: paises.map((p) => CountryCard(
+            data: CountryData(
+              flag:        p.bandera,
+              name:        p.pais,
+              code:        p.code,
+              pending:     p.pendientes,
+              news:        p.noticias,
+              accentColor: p.accentColor,
+            ),
+          )).toList(),
+        );
+      },
+    );
+  }
+
+  // ── Actividad ─────────────────────────────────────────────────────────────
+
+  Widget _buildActivityFeed() {
+    return FutureBuilder<List<_ActividadItem>>(
+      future: _actividadFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _loadingCard();
+        }
+        final actividad = snapshot.data ?? [];
+        if (actividad.isEmpty) {
+          return _emptyCard(
+            icon: Icons.history,
+            label: 'Sin actividad reciente',
+          );
+        }
+        final entries = actividad.map((a) => ActivityEntry(
+          text: '${a.texto}${a.pais.isNotEmpty ? ' · ${a.bandera}' : ''}',
+          time: a.tiempoRelativo,
+          type: a.activityType,
+        )).toList();
+        return ActivityFeed(entries: entries);
+      },
+    );
+  }
+
+  // ── Helpers de UI ─────────────────────────────────────────────────────────
+
+  Widget _loadingCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.fieldBorder, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+    );
+  }
+
+  Widget _emptyCard({required IconData icon, required String label}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.fieldBorder, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.fieldBg,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.fieldLabel,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _sectionLabel(String text) {
     return Row(
       children: [
@@ -474,13 +449,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
           text.toUpperCase(),
           style: const TextStyle(
             fontSize: 10,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: AppColors.primary,
-            letterSpacing: 1,
+            letterSpacing: 1.5,
           ),
         ),
         const SizedBox(width: 8),
-        Expanded(child: Container(height: 0.5, color: AppColors.fieldBorder)),
+        Expanded(
+          child: Container(
+            height: 0.5,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.fieldBorder, Colors.transparent],
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -516,55 +500,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-// ── Card de testimonio estilo "Por país" ──────────────────────────────────────
+// ── Card de testimonio ────────────────────────────────────────────────────────
 
 class _TestimonioCard extends StatelessWidget {
   final TestimonioModel t;
   const _TestimonioCard({required this.t});
 
   Color get _colorEstado => switch (t.estado) {
-    'publicado' => const Color(0xFF10B981),
-    'despublicado' => const Color(0xFFEF4444),
-    _ => const Color(0xFF9CA3AF),
+    'publicado'    => const Color(0xFF7B3FA0),
+    'despublicado' => const Color(0xFFE91E63),
+    _              => const Color(0xFF9CA3AF),
+  };
+
+  Color get _bgEstado => switch (t.estado) {
+    'publicado'    => const Color(0xFFEDE7F6),
+    'despublicado' => const Color(0xFFFCE4EC),
+    _              => const Color(0xFFF3F4F6),
   };
 
   Color get _accentColor => switch (t.pais.toLowerCase()) {
-    'colombia' => AppColors.countryBorderCo,
-    'chile' => AppColors.countryBorderCl,
-    'ecuador' => AppColors.countryBorderEc,
+    'colombia'  => AppColors.countryBorderCo,
+    'chile'     => AppColors.countryBorderCl,
+    'ecuador'   => AppColors.countryBorderEc,
     'argentina' => const Color(0xFF74ACDF),
-    _ => AppColors.primary,
+    _           => AppColors.primary,
   };
 
   @override
   Widget build(BuildContext context) {
-    final colorEstado = _colorEstado;
-    final accentColor = _accentColor;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.fieldBorder, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: IntrinsicHeight(
           child: Row(
             children: [
-              // Barra lateral color país
-              Container(width: 4, color: accentColor),
-
-              // Foto / avatar
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 11,
+              // Barra lateral con gradiente
+              Container(
+                width: 4,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      _accentColor,
+                      _accentColor.withOpacity(0.5),
+                    ],
+                  ),
                 ),
+              ),
+              // Avatar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
                 child: _avatar(),
               ),
-
               // Info
               Expanded(
                 child: Padding(
@@ -576,7 +577,7 @@ class _TestimonioCard extends StatelessWidget {
                         t.nombre,
                         style: const TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.fieldText,
                         ),
                       ),
@@ -588,15 +589,14 @@ class _TestimonioCard extends StatelessWidget {
                           color: AppColors.primary,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      // Badge de estado
+                      const SizedBox(height: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 7,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: colorEstado.withOpacity(0.10),
+                          color: _bgEstado,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -604,7 +604,7 @@ class _TestimonioCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w700,
-                            color: colorEstado,
+                            color: _colorEstado,
                           ),
                         ),
                       ),
@@ -612,7 +612,6 @@ class _TestimonioCard extends StatelessWidget {
                   ),
                 ),
               ),
-
               // Fecha + chevron
               Padding(
                 padding: const EdgeInsets.only(right: 12),
@@ -643,10 +642,10 @@ class _TestimonioCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Icon(
+                    Icon(
                       Icons.chevron_right_rounded,
                       size: 16,
-                      color: AppColors.fieldBorder,
+                      color: AppColors.primary.withOpacity(0.4),
                     ),
                   ],
                 ),

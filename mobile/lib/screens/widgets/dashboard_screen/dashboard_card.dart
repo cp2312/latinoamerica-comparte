@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
 import 'package:mobile/screens/models/dashboard_item.dart';
 
-/// Tarjeta de módulo del dashboard con estética rosada premium.
-/// Recibe un [DashboardItem] y delega el onTap al modelo.
 class DashboardCard extends StatelessWidget {
   const DashboardCard({super.key, required this.item});
 
@@ -19,7 +17,14 @@ class DashboardCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFF8BBD0), width: 0.5),
+          border: Border.all(color: AppColors.fieldBorder, width: 0.5),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.07),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +43,11 @@ class DashboardCard extends StatelessWidget {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F6),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
+        ),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Icon(item.icon, size: 22, color: AppColors.primary),
@@ -53,8 +62,8 @@ class DashboardCard extends StatelessWidget {
           item.title,
           style: const TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF4A0030),
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryDark,
           ),
         ),
         const SizedBox(height: 4),

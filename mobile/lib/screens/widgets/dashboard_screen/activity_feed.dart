@@ -15,7 +15,6 @@ class ActivityEntry {
   final ActivityType type;
 }
 
-/// Feed de actividad reciente con íconos en cajitas de color.
 class ActivityFeed extends StatelessWidget {
   const ActivityFeed({super.key, required this.entries});
 
@@ -28,11 +27,20 @@ class ActivityFeed extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.fieldBorder, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: List.generate(entries.length, (i) {
-          final isLast = i == entries.length - 1;
-          return _ActivityItem(entry: entries[i], isLast: isLast);
+          return _ActivityItem(
+            entry: entries[i],
+            isLast: i == entries.length - 1,
+          );
         }),
       ),
     );
@@ -53,7 +61,7 @@ class _ActivityItem extends StatelessWidget {
         border: isLast
             ? null
             : const Border(
-                bottom: BorderSide(color: Color(0xFFFFF0F6), width: 0.5),
+                bottom: BorderSide(color: Color(0xFFEDE7F6), width: 0.5),
               ),
       ),
       child: Row(
@@ -75,7 +83,7 @@ class _ActivityItem extends StatelessWidget {
             entry.time,
             style: const TextStyle(
               fontSize: 10,
-              color: Color(0xFFCE93D8),
+              color: Color(0xFF9575CD),
             ),
           ),
         ],
@@ -85,9 +93,21 @@ class _ActivityItem extends StatelessWidget {
 
   Widget _buildIconBox() {
     final (bg, iconColor, icon) = switch (entry.type) {
-      ActivityType.pending     => (AppColors.activityPend, AppColors.activityPendIcon, Icons.mail_outline_rounded),
-      ActivityType.published   => (AppColors.activityPub,  AppColors.activityPubIcon,  Icons.article_outlined),
-      ActivityType.testimonial => (AppColors.activityTest, AppColors.activityTestIcon, Icons.star_border_rounded),
+      ActivityType.pending => (
+        AppColors.activityPend,
+        AppColors.activityPendIcon,
+        Icons.mail_outline_rounded,
+      ),
+      ActivityType.published => (
+        AppColors.activityPub,
+        AppColors.activityPubIcon,
+        Icons.article_outlined,
+      ),
+      ActivityType.testimonial => (
+        AppColors.activityTest,
+        AppColors.activityTestIcon,
+        Icons.star_border_rounded,
+      ),
     };
 
     return Container(

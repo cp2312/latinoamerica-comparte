@@ -19,7 +19,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
 
-  String selectedCountry = 'Colombia';
+  String selectedCountry = '';
   String selectedStatus = 'borrador';
 
   PlatformFile? selectedImage;
@@ -29,12 +29,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   String userRole = '';
   String userCountry = '';
 
-  static const _countries = [
-    'Colombia',
-    'Chile',
-    'Argentina',
-    'Ecuador',
-  ];
+  static const _countries = ['Colombia', 'Chile', 'Argentina', 'Ecuador'];
 
   @override
   void initState() {
@@ -42,16 +37,23 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     _loadUserData();
   }
 
+  // ─────────────────────────────────────────────
+  // CARGAR DATOS DEL USUARIO
+  // ─────────────────────────────────────────────
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
 
-    setState(() {
-      userRole = prefs.getString('user_rol') ?? '';
-      userCountry = prefs.getString('user_pais') ?? 'Colombia';
+    final role = prefs.getString('user_rol') ?? '';
+    final country = prefs.getString('user_pais') ?? '';
 
-      // Si es admin-pais → automáticamente su país
-      if (userRole == 'admin-pais') {
-        selectedCountry = userCountry;
+    setState(() {
+      userRole = role;
+      userCountry = country;
+
+      if (role == 'admin_pais') {
+        selectedCountry = country;
+      } else {
+        selectedCountry = 'Colombia';
       }
     });
   }
@@ -63,7 +65,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     super.dispose();
   }
 
-  // ── Seleccionar imagen ─────────────────────────────
+  // ─────────────────────────────────────────────
+  // SELECCIONAR IMAGEN
+  // ─────────────────────────────────────────────
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -78,7 +82,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     }
   }
 
-  // ── Guardar noticia ────────────────────────────────
+  // ─────────────────────────────────────────────
+  // GUARDAR NOTICIA
+  // ─────────────────────────────────────────────
   Future<void> _saveNews() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -103,16 +109,11 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          success
-              ? 'Noticia creada correctamente'
-              : 'Error al guardar noticia',
+          success ? 'Noticia creada correctamente' : 'Error al guardar noticia',
         ),
-        backgroundColor:
-            success ? AppColors.primary : Colors.redAccent,
+        backgroundColor: success ? AppColors.primary : Colors.redAccent,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
 
@@ -121,10 +122,17 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     }
   }
 
-  // ── UI ─────────────────────────────────────────────
+  // ─────────────────────────────────────────────
+  // UI
+  // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final isAdminPais = userRole == 'admin-pais';
+    // Esperar datos del usuario
+    if (selectedCountry.isEmpty) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final isAdminPais = userRole == 'admin_pais';
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBg,
@@ -144,8 +152,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-
-                    /// TÍTULO
+                    // ───────── TÍTULO ─────────
                     NewsFormField(
                       label: 'Título',
                       icon: Icons.title_rounded,
@@ -161,7 +168,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
 
                     const SizedBox(height: 14),
 
-                    /// PAÍS
+                    // ───────── PAÍS ─────────
+
+                    // ADMIN-PAIS → país bloqueado
                     if (isAdminPais)
                       NewsFormField(
                         label: 'País',
@@ -170,7 +179,9 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                           text: selectedCountry,
                         ),
                         hint: '',
+                        enabled: false,
                       )
+                    // SUPERADMIN → dropdown completo
                     else
                       NewsFormDropdown<String>(
                         label: 'País',
@@ -191,7 +202,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
 
                     const SizedBox(height: 14),
 
-                    /// CONTENIDO
+                    // ───────── CONTENIDO ─────────
                     NewsFormField(
                       label: 'Contenido',
                       icon: Icons.notes_rounded,
@@ -206,33 +217,11 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 14),
-
-                    /// ESTADO
-                    NewsFormDropdown<String>(
-                      label: 'Estado',
-                      icon: Icons.toggle_on_outlined,
-                      value: selectedStatus,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'borrador',
-                          child: Text('Borrador'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'publicado',
-                          child: Text('Publicado'),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          selectedStatus = value!;
-                        });
-                      },
-                    ),
+                
 
                     const SizedBox(height: 14),
 
-                    /// IMAGEN
+                    // ───────── IMAGEN ─────────
                     NewsImagePicker(
                       onTap: _pickImage,
                       imageName: selectedImage?.name,
@@ -240,7 +229,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
 
                     const SizedBox(height: 22),
 
-                    /// BOTÓN GUARDAR
+                    // ───────── BOTÓN ─────────
                     NewsSubmitButton(
                       label: 'Guardar noticia',
                       onPressed: _saveNews,

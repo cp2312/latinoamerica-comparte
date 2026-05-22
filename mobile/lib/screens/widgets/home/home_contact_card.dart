@@ -54,14 +54,6 @@ class _HomeContactCardState extends State<HomeContactCard> {
 
     setState(() => _enviando = true);
 
-    // TODO Fase 4: llamar API pública
-    // await SolicitudesService().enviarSolicitud(
-    //   nombre:   _nombre.text,
-    //   correo:   _correo.text,
-    //   telefono: _telefono.text,
-    //   finalidad: _finalidad.text,
-    //   pais:     _paisSeleccionado,
-    // );
 
     await Future.delayed(const Duration(milliseconds: 800));
 

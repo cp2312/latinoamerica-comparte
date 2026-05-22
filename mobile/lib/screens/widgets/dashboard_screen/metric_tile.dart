@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
 
-/// Tile de métrica con dos variantes:
-/// [dark] = fondo rosado oscuro, [lite] = blanco con borde.
 class MetricTile extends StatelessWidget {
   const MetricTile({
     super.key,
@@ -19,34 +17,48 @@ class MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg     = dark ? AppColors.heroBottom : Colors.white;
-    final border = dark ? null : Border.all(color: AppColors.fieldBorder, width: 0.5);
-    final iconColor  = dark ? Colors.white.withOpacity(0.45) : AppColors.primary;
-    final numColor   = dark ? Colors.white : AppColors.primaryDark;
-    final lblColor   = dark ? Colors.white.withOpacity(0.60) : AppColors.primary;
+    final border    = dark ? null : Border.all(color: AppColors.fieldBorder, width: 0.5);
+    final iconColor = dark ? Colors.white.withOpacity(0.50) : AppColors.primary;
+    final numColor  = dark ? Colors.white : AppColors.primaryDark;
+    final lblColor  = dark ? Colors.white.withOpacity(0.60) : AppColors.primary;
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: bg,
+        gradient: dark
+            ? const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.heroTop, AppColors.heroMid1],
+              )
+            : null,
+        color: dark ? null : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: border,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(dark ? 0.25 : 0.07),
+            blurRadius: dark ? 20 : 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ícono con círculo de brillo decorativo
           Stack(
             children: [
               Icon(icon, size: 22, color: iconColor),
               Positioned(
-                top: -6, right: -6,
+                top: -6,
+                right: -6,
                 child: Container(
-                  width: 28, height: 28,
+                  width: 28,
+                  height: 28,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: dark
-                        ? Colors.white.withOpacity(0.07)
+                        ? Colors.white.withOpacity(0.08)
                         : AppColors.primary.withOpacity(0.05),
                   ),
                 ),
@@ -58,7 +70,7 @@ class MetricTile extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 28,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: numColor,
               height: 1,
             ),
