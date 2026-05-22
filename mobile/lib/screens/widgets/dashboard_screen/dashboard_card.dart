@@ -15,22 +15,18 @@ class DashboardCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+        gradient: const LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [AppColors.primary, AppColors.primaryDark],
+),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.fieldBorder, width: 0.5),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.07),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildIconBox(),
+            _buildTopRow(),
             _buildTexts(),
           ],
         ),
@@ -38,19 +34,29 @@ class DashboardCard extends StatelessWidget {
     );
   }
 
-  Widget _buildIconBox() {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
-        ),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Icon(item.icon, size: 22, color: AppColors.primary),
+  Widget _buildTopRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(item.icon, size: 24, color: Colors.white.withOpacity(0.9)),
+        if (item.badgeCount != null && item.badgeCount! > 0)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Text(
+              '${item.badgeCount}',
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -61,17 +67,17 @@ class DashboardCard extends StatelessWidget {
         Text(
           item.title,
           style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryDark,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           item.subtitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: AppColors.primary,
+            color: Colors.white.withOpacity(0.75),
           ),
         ),
       ],
