@@ -3,10 +3,11 @@ import News       from '../models/News';
 import Testimonio from '../models/Testimonio';
 import Solicitud  from '../models/Solicitud';
 import Actividad  from '../models/Actividad';
+import { AuthRequest } from '../types';
 
 const PAISES = ['Colombia', 'Chile', 'Ecuador', 'Argentina'] as const;
 
-// GET /dashboard/metricas
+// GET /dashboard/metricas — solo superadmin
 const getMetricas = async (_req: Request, res: Response): Promise<void> => {
   try {
     const [
@@ -52,19 +53,41 @@ const getMetricas = async (_req: Request, res: Response): Promise<void> => {
   }
 };
 
-// GET /dashboard/actividad — filtra por ?pais= si viene, ambas variantes de capitalización
+// GET /dashboard/metricas-pais — admin_pais: métricas solo de su país
+const getMetricasPais = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const authReq = req as AuthRequest;
+    // El pais viene del JWT (ya validado por roleMiddleware)
+    const pais = authReq.user?.pais ?? '';
+
+    if (!pais) {
+      res.status(400).json({ message: 'Usuario sin país asignado' });
+      return;
+    }
+
+    const [pendientes, noticiasActivas] = await Promise.all([
+      Solicitud.countDocuments({ pais, estado: 'pendiente' }),
+      News.countDocuments({ pais, estado: 'publicado' }),
+    ]);
+
+    res.json({ pais, pendientes, noticiasActivas });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+// GET /dashboard/actividad — filtra por ?pais= si viene
 const getActividad = async (req: Request, res: Response): Promise<void> => {
   try {
     const filtro: Record<string, unknown> = {};
 
     if (req.query.pais) {
-      // Acepta "chile", "Chile", "CHILE" — busca en minúscula siempre
       filtro.pais = (req.query.pais as string).toLowerCase();
     }
 
     const actividad = await Actividad.find(filtro)
       .sort({ fecha: -1 })
-      .limit(20)
+      .limit(5)
       .lean();
 
     res.json(actividad);
@@ -73,4 +96,4 @@ const getActividad = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export { getMetricas, getActividad };
+export { getMetricas, getMetricasPais, getActividad };

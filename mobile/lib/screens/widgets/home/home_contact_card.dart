@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
+import 'package:mobile/services/solicitudes_service.dart';
 
 /// Formulario público de contacto (RF-07 / HU-19).
 /// No requiere autenticación.
 /// [paisInicial] permite pre-seleccionar el país cuando se abre
 /// desde un portal de país específico.
-/// TODO Fase 4: conectar con POST /solicitudes (endpoint público sin JWT).
 class HomeContactCard extends StatefulWidget {
   final String paisInicial;
   /// Si viene de un portal de país específico, el selector queda bloqueado.
@@ -54,14 +54,30 @@ class _HomeContactCardState extends State<HomeContactCard> {
 
     setState(() => _enviando = true);
 
-
-    await Future.delayed(const Duration(milliseconds: 800));
+    final ok = await SolicitudesService().enviarSolicitudPublica(
+      nombre:    _nombre.text.trim(),
+      correo:    _correo.text.trim(),
+      telefono:  _telefono.text.trim(),
+      finalidad: _finalidad.text.trim(),
+      pais:      _paisSeleccionado,
+    );
 
     if (!mounted) return;
-    setState(() {
-      _enviando = false;
-      _enviado  = true;
-    });
+
+    if (ok) {
+      setState(() {
+        _enviando = false;
+        _enviado  = true;
+      });
+    } else {
+      setState(() => _enviando = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al enviar la solicitud. Intenta de nuevo.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override

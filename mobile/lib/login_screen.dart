@@ -126,6 +126,25 @@ Future<void> _onLogin() async {
         children: [
           const BackgroundLayer(),
           SafeArea(child: _buildScrollContent(context)),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, top: 4),
+              child: IconButton(
+                onPressed: () => Navigator.maybePop(context),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withOpacity(0.15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

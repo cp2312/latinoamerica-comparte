@@ -83,7 +83,7 @@ class DashboardAdminPaisScreen extends StatefulWidget {
 class _DashboardAdminPaisScreenState
     extends State<DashboardAdminPaisScreen> {
 
-  late Future<DashboardMetrics?>     _metricasFuture;
+  late Future<Map<String, dynamic>?> _metricasFuture;
   late Future<List<TestimonioModel>> _testimoniosFuture;
   late Future<List<ActivityEntry>>   _actividadFuture;
 
@@ -100,7 +100,7 @@ class _DashboardAdminPaisScreenState
 
   void _refresh() {
     setState(() {
-      _metricasFuture = DashboardService().getMetricas();
+      _metricasFuture = DashboardService().getMetricasPais();
 
       // ✅ CORRECCIÓN: se pasa en minúscula para que coincida con el backend
       _testimoniosFuture = TestimoniosService().getTestimonios(
@@ -184,9 +184,6 @@ class _DashboardAdminPaisScreenState
   Widget _buildHeader() {
     final top    = MediaQuery.of(context).padding.top;
     final partes = widget.usuario.nombre.trim().split(' ');
-    final iniciales = partes.length >= 2
-        ? '${partes[0][0]}${partes[1][0]}'.toUpperCase()
-        : widget.usuario.nombre.substring(0, 2).toUpperCase();
 
     return ClipPath(
       clipper: _WaveClipper(),
@@ -243,19 +240,23 @@ class _DashboardAdminPaisScreenState
                   ),
                 ),
                 const SizedBox(width: 12),
-                Container(
-                  width: 44, height: 44,
-                  decoration: BoxDecoration(
-                    shape:  BoxShape.circle,
-                    color:  Colors.white.withOpacity(0.20),
-                    border: Border.all(
-                        color: Colors.white.withOpacity(0.40), width: 1.5),
-                  ),
-                  child: Center(
-                    child: Text(iniciales,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 15,
-                            fontWeight: FontWeight.w500)),
+                GestureDetector(
+                  onTap: () => _logout(context),
+                  child: Container(
+                    width: 44, height: 44,
+                    decoration: BoxDecoration(
+                      shape:  BoxShape.circle,
+                      color:  Colors.white.withOpacity(0.20),
+                      border: Border.all(
+                          color: Colors.white.withOpacity(0.40), width: 1.5),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.logout_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -316,7 +317,6 @@ class _DashboardAdminPaisScreenState
             _buildActividad(),
             const SizedBox(height: 18),
 
-            _buildLogout(context),
           ],
         ),
       ),
@@ -369,7 +369,7 @@ class _DashboardAdminPaisScreenState
 
   // ── Card del país ─────────────────────────────────────────────────────────
   Widget _buildPorPais() {
-    return FutureBuilder<DashboardMetrics?>(
+    return FutureBuilder<Map<String, dynamic>?>(
       future: _metricasFuture,
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
@@ -378,11 +378,8 @@ class _DashboardAdminPaisScreenState
         int pendientes = 0;
         int noticias   = 0;
         if (snap.hasData && snap.data != null) {
-          final resumen = snap.data!.resumenDePais(_pais);
-          if (resumen != null) {
-            pendientes = resumen.solicitudesPendientes;
-            noticias   = resumen.noticiasActivas;
-          }
+          pendientes = (snap.data!['pendientes'] as num?)?.toInt() ?? 0;
+          noticias   = (snap.data!['noticiasActivas'] as num?)?.toInt() ?? 0;
         }
 
         String bandera;
