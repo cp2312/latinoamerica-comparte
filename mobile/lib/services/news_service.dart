@@ -5,18 +5,17 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:mobile/screens/models/news_model.dart';
+import 'package:mobile/constants/api_constants.dart';
 
 class NewsService {
   // BASE GENERAL DEL BACKEND
-  static const String baseUrl = 'http://127.0.0.1:3000';
+  static const String baseUrl = ApiConstants.baseUrl;
 
   // ─────────────────────────────────────────────
   // GET → TODAS LAS NOTICIAS (ADMIN)
   // GET → FILTRADAS POR PAÍS
   // ─────────────────────────────────────────────
-  Future<List<NewsModel>> getNews({
-    String? country,
-  }) async {
+  Future<List<NewsModel>> getNews({String? country}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
 
@@ -26,8 +25,7 @@ class NewsService {
 
       // filtro por país
       if (country != null && country.isNotEmpty) {
-        final encodedCountry =
-            Uri.encodeQueryComponent(country);
+        final encodedCountry = Uri.encodeQueryComponent(country);
 
         url += '?pais=$encodedCountry';
       }
@@ -48,9 +46,7 @@ class NewsService {
         }).toList();
       }
 
-      throw Exception(
-        'Error al cargar noticias (${response.statusCode})',
-      );
+      throw Exception('Error al cargar noticias (${response.statusCode})');
     } catch (e) {
       print(e);
       rethrow;
@@ -63,12 +59,8 @@ class NewsService {
   Future<List<NewsModel>> getPublicNews() async {
     try {
       final response = await http.get(
-        Uri.parse(
-          '$baseUrl/news?estado=publicado',
-        ),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        Uri.parse('$baseUrl/news?estado=publicado'),
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
@@ -89,20 +81,13 @@ class NewsService {
   // ─────────────────────────────────────────────
   // GET → NOTICIAS PÚBLICAS POR PAÍS
   // ─────────────────────────────────────────────
-  Future<List<NewsModel>> getPublicNewsByCountry(
-    String pais,
-  ) async {
+  Future<List<NewsModel>> getPublicNewsByCountry(String pais) async {
     try {
-      final encodedPais =
-          Uri.encodeQueryComponent(pais);
+      final encodedPais = Uri.encodeQueryComponent(pais);
 
       final response = await http.get(
-        Uri.parse(
-          '$baseUrl/news?estado=publicado&pais=$encodedPais',
-        ),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        Uri.parse('$baseUrl/news?estado=publicado&pais=$encodedPais'),
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
@@ -135,13 +120,9 @@ class NewsService {
 
       final token = prefs.getString('token');
 
-      final request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$baseUrl/news'),
-      );
+      final request = http.MultipartRequest('POST', Uri.parse('$baseUrl/news'));
 
-      request.headers['Authorization'] =
-          'Bearer $token';
+      request.headers['Authorization'] = 'Bearer $token';
 
       request.fields['titulo'] = title;
       request.fields['pais'] = country;
@@ -149,8 +130,7 @@ class NewsService {
       request.fields['estado'] = status;
 
       // imagen
-      if (imageFile != null &&
-          imageFile.bytes != null) {
+      if (imageFile != null && imageFile.bytes != null) {
         request.files.add(
           http.MultipartFile.fromBytes(
             'imagen',
@@ -190,8 +170,7 @@ class NewsService {
         Uri.parse('$baseUrl/news/$id'),
       );
 
-      request.headers['Authorization'] =
-          'Bearer $token';
+      request.headers['Authorization'] = 'Bearer $token';
 
       request.fields['titulo'] = title;
       request.fields['pais'] = country;
@@ -199,8 +178,7 @@ class NewsService {
       request.fields['estado'] = status;
 
       // imagen opcional
-      if (imageFile != null &&
-          imageFile.bytes != null) {
+      if (imageFile != null && imageFile.bytes != null) {
         request.files.add(
           http.MultipartFile.fromBytes(
             'imagen',

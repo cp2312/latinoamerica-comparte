@@ -9,14 +9,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile/constants/api_constants.dart';
 
 // ── Modelos ───────────────────────────────────────────────────────────────────
 
 class PaisResumen {
   final String pais;
-  final int    solicitudesPendientes;
-  final int    solicitudesTotal;
-  final int    noticiasActivas;
+  final int solicitudesPendientes;
+  final int solicitudesTotal;
+  final int noticiasActivas;
 
   const PaisResumen({
     required this.pais,
@@ -49,26 +50,39 @@ class DashboardMetrics {
     final g = j['globales'] as Map<String, dynamic>;
 
     final solicList = (j['solicitudesPorPais'] as List? ?? []);
-    final noticList = (j['noticiasPorPais']    as List? ?? []);
+    final noticList = (j['noticiasPorPais'] as List? ?? []);
 
-    final pendMap    = <String, int>{for (final e in solicList) e['pais'] as String: (e['pendientes'] as num).toInt()};
-    final totalSol   = <String, int>{for (final e in solicList) e['pais'] as String: (e['total']      as num).toInt()};
-    final activasMap = <String, int>{for (final e in noticList) e['pais'] as String: (e['activas']    as num).toInt()};
+    final pendMap = <String, int>{
+      for (final e in solicList)
+        e['pais'] as String: (e['pendientes'] as num).toInt(),
+    };
+    final totalSol = <String, int>{
+      for (final e in solicList)
+        e['pais'] as String: (e['total'] as num).toInt(),
+    };
+    final activasMap = <String, int>{
+      for (final e in noticList)
+        e['pais'] as String: (e['activas'] as num).toInt(),
+    };
 
     const paises = ['Colombia', 'Chile', 'Ecuador', 'Argentina'];
-    final porPais = paises.map((p) => PaisResumen(
-      pais:                    p,
-      solicitudesPendientes:   pendMap[p]  ?? 0,
-      solicitudesTotal:        totalSol[p] ?? 0,
-      noticiasActivas:         activasMap[p] ?? 0,
-    )).toList();
+    final porPais = paises
+        .map(
+          (p) => PaisResumen(
+            pais: p,
+            solicitudesPendientes: pendMap[p] ?? 0,
+            solicitudesTotal: totalSol[p] ?? 0,
+            noticiasActivas: activasMap[p] ?? 0,
+          ),
+        )
+        .toList();
 
     return DashboardMetrics(
-      totalNoticias:         (g['totalNoticias']         as num).toInt(),
-      noticiasActivas:       (g['noticiasActivas']       as num).toInt(),
-      totalTestimonios:      (g['totalTestimonios']      as num).toInt(),
+      totalNoticias: (g['totalNoticias'] as num).toInt(),
+      noticiasActivas: (g['noticiasActivas'] as num).toInt(),
+      totalTestimonios: (g['totalTestimonios'] as num).toInt(),
       testimoniosPublicados: (g['testimoniosPublicados'] as num).toInt(),
-      totalSolicitudes:      (g['totalSolicitudes']      as num).toInt(),
+      totalSolicitudes: (g['totalSolicitudes'] as num).toInt(),
       solicitudesPendientes: (g['solicitudesPendientes'] as num).toInt(),
       porPais: porPais,
     );
@@ -89,13 +103,13 @@ class DashboardMetrics {
 // ── Servicio ──────────────────────────────────────────────────────────────────
 
 class DashboardService {
-  static const String _baseUrl = 'http://localhost:3000';
+  static const String _baseUrl = ApiConstants.baseUrl;
 
   Future<Map<String, String>> _headers() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     return {
-      'Content-Type':  'application/json',
+      'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     };
   }

@@ -1,64 +1,73 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile/constants/api_constants.dart';
 
 // ── Clase resultado de envío ──────────────────────────────────────────────────
 
 class RespuestaEnvio {
-  final bool   ok;
+  final bool ok;
   final String mensaje;
   RespuestaEnvio({required this.ok, required this.mensaje});
 }
 
-
 // ── Modelo ────────────────────────────────────────────────────────────────────
 
 class SolicitudModel {
-  final String  id;
-  final String  nombre;
-  final String  correo;
-  final String  telefono;
-  final String  finalidad;
-  final String  pais;
-  final String  estado;
+  final String id;
+  final String nombre;
+  final String correo;
+  final String telefono;
+  final String finalidad;
+  final String pais;
+  final String estado;
   final String? createdAt;
 
   SolicitudModel.fromJson(Map<String, dynamic> j)
-      : id        = j['_id']       ?? '',
-        nombre    = j['nombre']    ?? '',
-        correo    = j['correo']    ?? '',
-        telefono  = j['telefono']  ?? '',
-        finalidad = j['finalidad'] ?? '',
-        pais      = j['pais']      ?? '',
-        estado    = j['estado']    ?? 'pendiente',
-        createdAt = j['createdAt'];
+    : id = j['_id'] ?? '',
+      nombre = j['nombre'] ?? '',
+      correo = j['correo'] ?? '',
+      telefono = j['telefono'] ?? '',
+      finalidad = j['finalidad'] ?? '',
+      pais = j['pais'] ?? '',
+      estado = j['estado'] ?? 'pendiente',
+      createdAt = j['createdAt'];
 
   String get bandera {
     switch (pais.toLowerCase()) {
-      case 'colombia':  return '🇨🇴';
-      case 'chile':     return '🇨🇱';
-      case 'ecuador':   return '🇪🇨';
-      case 'argentina': return '🇦🇷';
-      default:          return '🌎';
+      case 'colombia':
+        return '🇨🇴';
+      case 'chile':
+        return '🇨🇱';
+      case 'ecuador':
+        return '🇪🇨';
+      case 'argentina':
+        return '🇦🇷';
+      default:
+        return '🌎';
     }
   }
 
   String get fechaFormateada {
     if (createdAt == null) return '';
-    try { return createdAt!.substring(0, 10); } catch (_) { return ''; }
+    try {
+      return createdAt!.substring(0, 10);
+    } catch (_) {
+      return '';
+    }
   }
 }
 
 // ── Servicio ──────────────────────────────────────────────────────────────────
 
 class SolicitudesService {
-  static const String _baseUrl = 'http://localhost:3000';
+  static const String _baseUrl = ApiConstants.baseUrl;
 
   Future<Map<String, String>> _authHeaders() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
     return {
-      'Content-Type':  'application/json',
+      'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     };
   }
@@ -76,22 +85,28 @@ class SolicitudesService {
         Uri.parse('$_baseUrl/solicitudes/public'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'nombre': nombre, 'correo': correo, 'telefono': telefono,
-          'finalidad': finalidad, 'pais': pais,
+          'nombre': nombre,
+          'correo': correo,
+          'telefono': telefono,
+          'finalidad': finalidad,
+          'pais': pais,
         }),
       );
       return response.statusCode == 201;
-    } catch (_) { return false; }
+    } catch (_) {
+      return false;
+    }
   }
 
   // GET /solicitudes
   Future<List<SolicitudModel>> getSolicitudes({
-    String? pais, String? estado,
+    String? pais,
+    String? estado,
   }) async {
     try {
       String path = '/solicitudes';
       final params = <String>[];
-      if (pais   != null) params.add('pais=$pais');
+      if (pais != null) params.add('pais=$pais');
       if (estado != null) params.add('estado=$estado');
       if (params.isNotEmpty) path += '?${params.join('&')}';
 
@@ -105,7 +120,9 @@ class SolicitudesService {
         return data.map((e) => SolicitudModel.fromJson(e)).toList();
       }
       return [];
-    } catch (_) { return []; }
+    } catch (_) {
+      return [];
+    }
   }
 
   // PATCH /solicitudes/:id/estado
@@ -117,7 +134,9 @@ class SolicitudesService {
         body: jsonEncode({'estado': estado}),
       );
       return response.statusCode == 200;
-    } catch (_) { return false; }
+    } catch (_) {
+      return false;
+    }
   }
 
   // POST /solicitudes/:id/responder — envía correo de respuesta
@@ -129,10 +148,16 @@ class SolicitudesService {
         body: jsonEncode({'mensaje': mensaje}),
       );
       if (response.statusCode == 200) {
-        return RespuestaEnvio(ok: true, mensaje: 'Correo enviado correctamente');
+        return RespuestaEnvio(
+          ok: true,
+          mensaje: 'Correo enviado correctamente',
+        );
       }
       final body = jsonDecode(response.body);
-      return RespuestaEnvio(ok: false, mensaje: body['message'] ?? 'Error al enviar');
+      return RespuestaEnvio(
+        ok: false,
+        mensaje: body['message'] ?? 'Error al enviar',
+      );
     } catch (e) {
       return RespuestaEnvio(ok: false, mensaje: 'Error de conexión: $e');
     }
@@ -146,6 +171,8 @@ class SolicitudesService {
         headers: await _authHeaders(),
       );
       return response.statusCode == 200;
-    } catch (_) { return false; }
+    } catch (_) {
+      return false;
+    }
   }
 }

@@ -7,6 +7,7 @@ import 'package:mobile/screens/widgets/home/home_section_title.dart';
 import 'package:mobile/screens/widgets/home/home_testimonial_card.dart';
 import 'package:mobile/screens/widgets/home/home_contact_card.dart';
 
+
 // ── Configuración visual por país ─────────────────────────────────────────────
 
 class _PaisConfig {

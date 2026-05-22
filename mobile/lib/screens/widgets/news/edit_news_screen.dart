@@ -6,6 +6,7 @@ import 'package:mobile/screens/models/news_model.dart';
 import 'package:mobile/services/news_service.dart';
 import 'news_form_hero.dart';
 import 'news_form_widgets.dart';
+import 'package:mobile/constants/api_constants.dart';
 
 class EditNewsScreen extends StatefulWidget {
   const EditNewsScreen({
@@ -303,7 +304,7 @@ class _EditNewsScreenState extends State<EditNewsScreen> {
         ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: Image.network(
-            'http://127.0.0.1:3000${widget.news.image}',
+            '${ApiConstants.baseUrl}${widget.news.image}',
             height: 160,
             width: double.infinity,
             fit: BoxFit.cover,

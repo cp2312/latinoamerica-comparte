@@ -15,6 +15,7 @@ import 'package:mobile/screens/widgets/solicitudes/solicitudes_screen.dart';
 import 'package:mobile/screens/widgets/testimonios/testimonios_screen.dart';
 import 'package:mobile/services/testimonios_service.dart';
 import 'package:mobile/screens/widgets/pais/pais_screen.dart';
+import 'package:mobile/constants/api_constants.dart';
 
 // ── Modelo de actividad ───────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ class _ActividadItem {
 // ── Servicio de actividad ─────────────────────────────────────────────────────
 
 class _ActividadService {
-  static const String _base = 'http://localhost:3000/dashboard';
+  static const String _base = ApiConstants.baseUrl;
 
   Future<List<_ActividadItem>> getActividad() async {
     final prefs = await SharedPreferences.getInstance();
@@ -151,7 +152,7 @@ class _PaisMetrics {
 // ── Servicio de métricas ──────────────────────────────────────────────────────
 
 class _MetricasService {
-  static const String _base = 'http://localhost:3000/dashboard';
+  static const String _base = ApiConstants.baseUrl;
 
   Future<List<_PaisMetrics>> getPorPais() async {
     final prefs = await SharedPreferences.getInstance();

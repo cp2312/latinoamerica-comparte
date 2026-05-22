@@ -17,11 +17,12 @@ import 'package:mobile/screens/widgets/solicitudes/solicitudes_screen.dart';
 import 'package:mobile/screens/widgets/testimonios/testimonios_screen.dart';
 import 'package:mobile/services/dashboard_service.dart';
 import 'package:mobile/services/testimonios_service.dart';
+import 'package:mobile/constants/api_constants.dart';
 
 // ── Actividad filtrada por país ───────────────────────────────────────────────
 
 class _ActividadService {
-  static const String _base = 'http://localhost:3000/dashboard';
+  static const String _base = ApiConstants.baseUrl + '/dashboard';
 
   Future<List<ActivityEntry>> getActividad(String pais) async {
     final prefs = await SharedPreferences.getInstance();
