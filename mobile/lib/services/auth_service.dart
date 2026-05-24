@@ -9,66 +9,193 @@ class AuthService {
 
   // ── Login ────────────────────────────────────────────────────────────────────
 
-  /// Retorna [UserModel] si el login fue exitoso, o null si falló.
-Future<Map<String, dynamic>> login({
+  /// Retorna UserModel si el login fue exitoso.
+  Future<Map<String, dynamic>> login({
+    required String correo,
+    required String password,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/auth/login'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'correo': correo,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data =
+            jsonDecode(response.body) as Map<String, dynamic>;
+
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setString(
+          'token',
+          data['token'] as String,
+        );
+
+        final user = UserModel.fromJson(
+          data['user'] as Map<String, dynamic>,
+        );
+
+        await prefs.setString('user_rol', user.rol);
+        await prefs.setString('user_nombre', user.nombre);
+
+        if (user.pais != null) {
+          await prefs.setString(
+            'user_pais',
+            user.pais!,
+          );
+        }
+
+        return {
+          'error': false,
+          'user': user,
+        };
+      }
+
+      // País inactivo
+      if (response.statusCode == 403) {
+        final body =
+            jsonDecode(response.body) as Map<String, dynamic>;
+
+        return {
+          'error': true,
+          'message':
+              body['message'] ?? 'Acceso denegado',
+          'codigo': body['codigo'] ?? '',
+        };
+      }
+
+      // Credenciales incorrectas
+      return {
+        'error': true,
+        'message': 'Credenciales incorrectas',
+        'codigo': '',
+      };
+
+    } catch (_) {
+      return {
+        'error': true,
+        'message': 'Error de conexión',
+        'codigo': '',
+      };
+    }
+  }
+
+ // ── RECUPERAR CONTRASEÑA ───────────────────────────────────────────────────
+
+Future<Map<String, dynamic>> forgotPassword({
   required String correo,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse(
+        '$_baseUrl/auth/forgot-password',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'correo': correo,
+      }),
+    );
+
+    final data =
+        jsonDecode(response.body) as Map<String, dynamic>;
+
+    if (response.statusCode == 200) {
+      return {
+        'error': false,
+        'message':
+            data['message'] ??
+            'Correo enviado correctamente',
+      };
+    }
+
+    return {
+      'error': true,
+      'message':
+          data['message'] ??
+          'Error al enviar correo',
+    };
+
+  } catch (e) {
+    return {
+      'error': true,
+      'message': 'Error de conexión',
+    };
+  }
+}
+
+// ── RESET PASSWORD ─────────────────────────────────────────────────────────
+
+Future<Map<String, dynamic>> resetPassword({
+  required String token,
   required String password,
 }) async {
   try {
     final response = await http.post(
-      Uri.parse('$_baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body:    jsonEncode({'correo': correo, 'password': password}),
+      Uri.parse(
+        '$_baseUrl/auth/reset-password',
+      ),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'token': token,
+        'password': password,
+      }),
     );
 
-    // ✅ Login exitoso
+    final data =
+        jsonDecode(response.body) as Map<String, dynamic>;
+
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', data['token'] as String);
-
-      final user = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-      await prefs.setString('user_rol',    user.rol);
-      await prefs.setString('user_nombre', user.nombre);
-      if (user.pais != null) await prefs.setString('user_pais', user.pais!);
-
-      // ✅ Retorna el UserModel dentro del mapa para que login_screen lo use
-      return {'error': false, 'user': user};
-    }
-
-    // ✅ País en mantenimiento — el backend mandó 403 con codigo: PAIS_INACTIVO
-    if (response.statusCode == 403) {
-      final body = jsonDecode(response.body) as Map<String, dynamic>;
       return {
-        'error':   true,
-        'message': body['message'] ?? 'Acceso denegado',
-        'codigo':  body['codigo']  ?? '',
+        'error': false,
+        'message':
+            data['message'] ??
+            'Contraseña actualizada',
       };
     }
 
-    // Credenciales incorrectas u otro error del servidor
-    return {'error': true, 'message': 'Credenciales incorrectas', 'codigo': ''};
+    return {
+      'error': true,
+      'message':
+          data['message'] ??
+          'No se pudo actualizar la contraseña',
+    };
 
-  } catch (_) {
-    return {'error': true, 'message': 'Error de conexión', 'codigo': ''};
+  } catch (e) {
+    return {
+      'error': true,
+      'message': 'Error de conexión',
+    };
   }
 }
 
-  // ── Logout ───────────────────────────────────────────────────────────────────
+  // ── Logout ─────────────────────────────────────────────────────────────────
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs =
+        await SharedPreferences.getInstance();
+
     await prefs.remove('token');
     await prefs.remove('user_rol');
     await prefs.remove('user_nombre');
     await prefs.remove('user_pais');
   }
 
-  // ── Token ────────────────────────────────────────────────────────────────────
+  // ── Token ──────────────────────────────────────────────────────────────────
 
   Future<String?> getToken() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs =
+        await SharedPreferences.getInstance();
+
     return prefs.getString('token');
   }
 }

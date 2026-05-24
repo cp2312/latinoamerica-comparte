@@ -9,6 +9,7 @@ import 'package:mobile/screens/widgets/home/home_news_card.dart';
 import 'package:mobile/screens/widgets/home/home_section_title.dart';
 import 'package:mobile/screens/widgets/home/home_testimonial_card.dart';
 import 'package:mobile/screens/widgets/home/home_contact_card.dart';
+import 'package:mobile/constants/app_colors.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,17 +17,25 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F0FA),
+      backgroundColor: AppColors.scaffoldBg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6A0080),
+        backgroundColor: AppColors.primaryDark,
         elevation: 0,
         title: Row(
           children: [
-            Image.asset('assets/images/logo_latam1.png', height: 32, fit: BoxFit.contain),
+            Image.asset(
+              'assets/images/logo_latam1.png',
+              height: 32,
+              fit: BoxFit.contain,
+            ),
             const SizedBox(width: 10),
             const Text(
               'Latinoamérica Comparte',
-              style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: AppColors.heroText,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -35,13 +44,27 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(right: 12),
             child: TextButton.icon(
               onPressed: () => Navigator.push(
-                context, MaterialPageRoute(builder: (_) => const LoginScreen())),
-              icon: const Icon(Icons.lock_outline, color: Colors.white, size: 18),
-              label: const Text('Iniciar sesión', style: TextStyle(color: Colors.white, fontSize: 13)),
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              ),
+              icon: const Icon(
+                Icons.lock_outline,
+                color: AppColors.heroText,
+                size: 18,
+              ),
+              label: const Text(
+                'Iniciar sesión',
+                style: TextStyle(color: AppColors.heroText, fontSize: 13),
+              ),
               style: TextButton.styleFrom(
-                backgroundColor: Colors.white.withOpacity(0.15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                backgroundColor: AppColors.logoBg,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
               ),
             ),
           ),
@@ -57,17 +80,26 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 32),
             const _ImpactoSection(),
             const SizedBox(height: 32),
-            const HomeSectionTitle(titulo: 'Últimas noticias', icono: Icons.article_outlined),
+            const HomeSectionTitle(
+              titulo: 'Últimas noticias',
+              icono: Icons.article_outlined,
+            ),
             const SizedBox(height: 12),
             _NewsSection(),
             const SizedBox(height: 32),
-            const HomeSectionTitle(titulo: 'Testimonios de éxito', icono: Icons.format_quote_rounded),
+            const HomeSectionTitle(
+              titulo: 'Testimonios de éxito',
+              icono: Icons.format_quote_rounded,
+            ),
             const SizedBox(height: 12),
             const _TestimonialsSection(),
             const SizedBox(height: 32),
             const _EquipoSection(),
             const SizedBox(height: 32),
-            const HomeSectionTitle(titulo: 'Contáctanos', icono: Icons.mail_outline),
+            const HomeSectionTitle(
+              titulo: 'Contáctanos',
+              icono: Icons.mail_outline,
+            ),
             const SizedBox(height: 12),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -92,39 +124,63 @@ class _QuienesSomosSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const HomeSectionTitle(titulo: 'Quiénes somos', icono: Icons.info_outline),
+        const HomeSectionTitle(
+          titulo: 'Quiénes somos',
+          icono: Icons.info_outline,
+        ),
         const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, 4)),
+                BoxShadow(
+                  color: AppColors.primaryDark.withOpacity(0.06),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
               ],
             ),
             child: Column(
               children: [
-                Image.asset('assets/images/logo_latam.png', height: 70, fit: BoxFit.contain),
+                Image.asset(
+                  'assets/images/logo_latam.png',
+                  height: 70,
+                  fit: BoxFit.contain,
+                ),
                 const SizedBox(height: 20),
                 const Text(
                   'En Latinoamérica Comparte creemos que transformar personas es transformar empresas.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2E2E2E), height: 1.4),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.fieldText,
+                    height: 1.4,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 const Text(
                   'Nacimos de una historia real de pérdida, fe y propósito.\n\nLo que comenzó en Colombia como un movimiento para ayudar a familias a reconstruir su productividad, hoy se ha convertido en una red continental que promueve el bienestar, la cultura organizacional y el emprendimiento con propósito.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.black54, height: 1.7),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.primaryDark,
+                    height: 1.7,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 const Text(
                   'En cada país acompañamos a personas, familias y empresas a reencontrar su propósito productivo y a construir un futuro sostenible. Porque cuando un país comparte, Latinoamérica avanza.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.black54, height: 1.7),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.primaryDark,
+                    height: 1.7,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -156,7 +212,10 @@ class _LogoPais extends StatelessWidget {
       children: [
         Image.asset(asset, height: 44, width: 44, fit: BoxFit.contain),
         const SizedBox(height: 4),
-        Text(nombre, style: const TextStyle(fontSize: 9, color: Colors.black45)),
+        Text(
+          nombre,
+          style: const TextStyle(fontSize: 9, color: AppColors.heroSubText),
+        ),
       ],
     );
   }
@@ -170,25 +229,50 @@ class _ImpactoSection extends StatelessWidget {
   const _ImpactoSection();
 
   static const _cifras = [
-    {'numero': '10+',    'label': 'Años de impacto\nsocial y empresarial', 'icono': Icons.calendar_today_outlined},
-    {'numero': '5.000+', 'label': 'Familias\ntransformadas',               'icono': Icons.family_restroom_outlined},
-    {'numero': '2.000+', 'label': 'Emprendimientos\ncreados',               'icono': Icons.storefront_outlined},
-    {'numero': '50+',    'label': 'Empresas\naliadas',                      'icono': Icons.business_outlined},
+    {
+      'numero': '10+',
+      'label': 'Años de impacto\nsocial y empresarial',
+      'icono': Icons.calendar_today_outlined,
+    },
+    {
+      'numero': '5.000+',
+      'label': 'Familias\ntransformadas',
+      'icono': Icons.family_restroom_outlined,
+    },
+    {
+      'numero': '2.000+',
+      'label': 'Emprendimientos\ncreados',
+      'icono': Icons.storefront_outlined,
+    },
+    {
+      'numero': '50+',
+      'label': 'Empresas\naliadas',
+      'icono': Icons.business_outlined,
+    },
   ];
 
   static const _empresas = [
-    {'asset': 'assets/images/empresas/alpina.png',        'nombre': 'Alpina'},
-    {'asset': 'assets/images/empresas/amcor.png',         'nombre': 'AMCOR'},
-    {'asset': 'assets/images/empresas/boehringer.png',    'nombre': 'Boehringer'},
-    {'asset': 'assets/images/empresas/brinks.png',        'nombre': 'Brinks'},
-    {'asset': 'assets/images/empresas/cencosud.png',      'nombre': 'Cencosud'},
-    {'asset': 'assets/images/empresas/grupo_exito.png',   'nombre': 'Grupo Éxito'},
-    {'asset': 'assets/images/empresas/grupo_nutresa.png', 'nombre': 'Grupo Nutresa'},
-    {'asset': 'assets/images/empresas/sodimac.png',       'nombre': 'Sodimac'},
-    {'asset': 'assets/images/empresas/jm_tracking.png',   'nombre': 'JM Tracking'},
-    {'asset': 'assets/images/empresas/soenergy.png',      'nombre': 'SoEnergy'},
-    {'asset': 'assets/images/empresas/olimpia_it.png',    'nombre': 'Olimpia IT'},
-    {'asset': 'assets/images/empresas/sanfer.png',        'nombre': 'Sanfer'},
+    {'asset': 'assets/images/empresas/alpina.png', 'nombre': 'Alpina'},
+    {'asset': 'assets/images/empresas/amcor.png', 'nombre': 'AMCOR'},
+    {'asset': 'assets/images/empresas/boehringer.png', 'nombre': 'Boehringer'},
+    {'asset': 'assets/images/empresas/brinks.png', 'nombre': 'Brinks'},
+    {'asset': 'assets/images/empresas/cencosud.png', 'nombre': 'Cencosud'},
+    {
+      'asset': 'assets/images/empresas/grupo_exito.png',
+      'nombre': 'Grupo Éxito',
+    },
+    {
+      'asset': 'assets/images/empresas/grupo_nutresa.png',
+      'nombre': 'Grupo Nutresa',
+    },
+    {'asset': 'assets/images/empresas/sodimac.png', 'nombre': 'Sodimac'},
+    {
+      'asset': 'assets/images/empresas/jm_tracking.png',
+      'nombre': 'JM Tracking',
+    },
+    {'asset': 'assets/images/empresas/soenergy.png', 'nombre': 'SoEnergy'},
+    {'asset': 'assets/images/empresas/olimpia_it.png', 'nombre': 'Olimpia IT'},
+    {'asset': 'assets/images/empresas/sanfer.png', 'nombre': 'Sanfer'},
   ];
 
   @override
@@ -196,7 +280,10 @@ class _ImpactoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HomeSectionTitle(titulo: 'Nuestro impacto', icono: Icons.bar_chart_outlined),
+        const HomeSectionTitle(
+          titulo: 'Nuestro impacto',
+          icono: Icons.bar_chart_outlined,
+        ),
         const SizedBox(height: 16),
 
         Padding(
@@ -208,11 +295,15 @@ class _ImpactoSection extends StatelessWidget {
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 1.6,
-            children: _cifras.map((c) => _CifraCard(
-              numero: c['numero']! as String,
-              label:  c['label']!  as String,
-              icono:  c['icono']!  as IconData,
-            )).toList(),
+            children: _cifras
+                .map(
+                  (c) => _CifraCard(
+                    numero: c['numero']! as String,
+                    label: c['label']! as String,
+                    icono: c['icono']! as IconData,
+                  ),
+                )
+                .toList(),
           ),
         ),
 
@@ -225,12 +316,20 @@ class _ImpactoSection extends StatelessWidget {
             children: [
               const Text(
                 'Empresas que comparten',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2E2E2E)),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.fieldText,
+                ),
               ),
               const SizedBox(height: 6),
               const Text(
                 'Las empresas que creen en el bienestar y la productividad con propósito hacen parte de esta red. Gracias a ellas, más familias en Latinoamérica vuelven a creer, crear y prosperar.',
-                style: TextStyle(fontSize: 12, color: Colors.black45, height: 1.5),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.primaryDark,
+                  height: 1.5,
+                ),
               ),
             ],
           ),
@@ -267,10 +366,14 @@ class _EmpresaCard extends StatelessWidget {
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 10, offset: const Offset(0, 3)),
+          BoxShadow(
+            color: AppColors.primaryDark.withOpacity(0.07),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
         ],
       ),
       child: Column(
@@ -283,7 +386,11 @@ class _EmpresaCard extends StatelessWidget {
               errorBuilder: (_, __, ___) => Text(
                 nombre,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF6A0080)),
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
               ),
             ),
           ),
@@ -294,10 +401,14 @@ class _EmpresaCard extends StatelessWidget {
 }
 
 class _CifraCard extends StatelessWidget {
-  final String   numero;
-  final String   label;
+  final String numero;
+  final String label;
   final IconData icono;
-  const _CifraCard({required this.numero, required this.label, required this.icono});
+  const _CifraCard({
+    required this.numero,
+    required this.label,
+    required this.icono,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -305,24 +416,42 @@ class _CifraCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF6A0080), Color(0xFF9C27B0)],
+          colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF6A0080).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: AppColors.primaryDark.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icono, color: Colors.white70, size: 20),
+          Icon(icono, color: AppColors.heroSubText, size: 20),
           const SizedBox(height: 6),
-          Text(numero, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          Text(
+            numero,
+            style: const TextStyle(
+              color: AppColors.heroText,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10, height: 1.3)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.heroSubText,
+              fontSize: 10,
+              height: 1.3,
+            ),
+          ),
         ],
       ),
     );
@@ -337,12 +466,12 @@ class _EquipoSection extends StatelessWidget {
   const _EquipoSection();
 
   static const _equipo = [
-    {'nombre': 'Carolina Ruiz',        'cargo': 'Cofundadora y CEO'},
+    {'nombre': 'Carolina Ruiz', 'cargo': 'Cofundadora y CEO'},
     {'nombre': 'Eduardo Del Castillo', 'cargo': 'Cofundador y VP Comercial'},
-    {'nombre': 'Marcela Moreno',       'cargo': 'Directora de Relacionamiento'},
-    {'nombre': 'Angie Castañeda',      'cargo': 'Coordinadora Académica Edifica'},
-    {'nombre': 'Mariana Gomez',        'cargo': 'Directora de Mercadeo'},
-    {'nombre': 'Nancy Vivas',          'cargo': 'Directora de Comunicación Digital'},
+    {'nombre': 'Marcela Moreno', 'cargo': 'Directora de Relacionamiento'},
+    {'nombre': 'Angie Castañeda', 'cargo': 'Coordinadora Académica Edifica'},
+    {'nombre': 'Mariana Gomez', 'cargo': 'Directora de Mercadeo'},
+    {'nombre': 'Nancy Vivas', 'cargo': 'Directora de Comunicación Digital'},
   ];
 
   @override
@@ -350,13 +479,20 @@ class _EquipoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HomeSectionTitle(titulo: 'Nuestro equipo', icono: Icons.people_outline),
+        const HomeSectionTitle(
+          titulo: 'Nuestro equipo',
+          icono: Icons.people_outline,
+        ),
         const SizedBox(height: 8),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             'El corazón de Latinoamérica Comparte está en las personas que día a día trabajan por transformar vidas.',
-            style: TextStyle(fontSize: 13, color: Colors.black45, height: 1.5),
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.heroBottom,
+              height: 1.5,
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -395,10 +531,14 @@ class _IntegranteCard extends StatelessWidget {
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: AppColors.primaryDark.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
@@ -410,7 +550,7 @@ class _IntegranteCard extends StatelessWidget {
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [Color(0xFF6A0080), Color(0xFF9C27B0)],
+                colors: [AppColors.primaryDark, AppColors.primary],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -418,7 +558,11 @@ class _IntegranteCard extends StatelessWidget {
             child: Center(
               child: Text(
                 _iniciales,
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: AppColors.heroText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -428,7 +572,12 @@ class _IntegranteCard extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF2E2E2E), height: 1.3),
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppColors.fieldText,
+              height: 1.3,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -436,7 +585,11 @@ class _IntegranteCard extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 10, color: Colors.black45, height: 1.3),
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppColors.heroSubText,
+              height: 1.3,
+            ),
           ),
         ],
       ),
@@ -457,9 +610,7 @@ class _NewsSection extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(
-                color: Color(0xFF6A0080),
-              ),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
           );
         }
@@ -473,9 +624,7 @@ class _NewsSection extends StatelessWidget {
         final noticias = snapshot.data!;
 
         if (noticias.isEmpty) {
-          return const _EmptyState(
-            mensaje: 'No hay noticias publicadas aún',
-          );
+          return const _EmptyState(mensaje: 'No hay noticias publicadas aún');
         }
 
         return SizedBox(
@@ -485,9 +634,7 @@ class _NewsSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             itemCount: noticias.length,
             itemBuilder: (context, index) {
-              return HomeNewsCard(
-                noticia: noticias[index],
-              );
+              return HomeNewsCard(noticia: noticias[index]);
             },
           ),
         );
@@ -512,14 +659,16 @@ class _TestimonialsSection extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(32),
-              child: CircularProgressIndicator(color: Color(0xFF6A0080)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
           );
         }
 
         final testimonios = snapshot.data ?? [];
         if (testimonios.isEmpty) {
-          return const _EmptyState(mensaje: 'No hay testimonios publicados aún');
+          return const _EmptyState(
+            mensaje: 'No hay testimonios publicados aún',
+          );
         }
 
         return SizedBox(
@@ -531,9 +680,9 @@ class _TestimonialsSection extends StatelessWidget {
             itemBuilder: (context, index) {
               final t = testimonios[index];
               return HomeTestimonialCard(
-                nombre:  t.nombre,
-                pais:    t.pais,
-                texto:   t.testimonio,
+                nombre: t.nombre,
+                pais: t.pais,
+                texto: t.testimonio,
                 fotoUrl: t.fotoUrl,
               );
             },
@@ -556,7 +705,10 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Text(mensaje, style: const TextStyle(color: Colors.black45, fontSize: 13)),
+      child: Text(
+        mensaje,
+        style: const TextStyle(color: AppColors.heroSubText, fontSize: 13),
+      ),
     );
   }
 }
