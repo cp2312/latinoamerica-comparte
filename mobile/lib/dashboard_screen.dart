@@ -246,7 +246,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: AppColors.scaffoldBg,
       body: Column(
         children: [
-          const DashboardHeader(userRole: 'Superadmin', country: 'Global'),
+          DashboardHeader(userRole: 'Superadmin', country: 'Global', onLogout: () => _logout(context)),
           Expanded(child: _buildScrollContent(context)),
         ],
       ),
@@ -280,7 +280,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 10),
             _buildActivityFeed(),
             const SizedBox(height: 24),
-            _buildLogoutButton(context),
           ],
         ),
       ),

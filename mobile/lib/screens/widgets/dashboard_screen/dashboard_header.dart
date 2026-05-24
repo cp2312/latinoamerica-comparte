@@ -7,17 +7,12 @@ class DashboardHeader extends StatelessWidget {
     super.key,
     this.userRole = 'Superadmin',
     this.country = 'Global',
+    this.onLogout,
   });
 
   final String userRole;
   final String country;
-
-  String get _initials {
-    final p = userRole.trim().split(' ');
-    return p.length >= 2
-        ? '${p[0][0]}${p[1][0]}'.toUpperCase()
-        : userRole.substring(0, 2).toUpperCase();
-  }
+  final VoidCallback? onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +97,7 @@ class DashboardHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        _buildAvatar(),
+        _buildLogoutButton(),
       ],
     );
   }
@@ -142,29 +137,29 @@ class DashboardHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildLogoutButton() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.40),
-              width: 1.5,
+        child: GestureDetector(
+          onTap: onLogout,
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.40),
+                width: 1.5,
+              ),
             ),
-          ),
-          child: Center(
-            child: Text(
-              _initials,
-              style: const TextStyle(
+            child: const Center(
+              child: Icon(
+                Icons.logout_rounded,
                 color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+                size: 20,
               ),
             ),
           ),
