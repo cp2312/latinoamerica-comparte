@@ -1,24 +1,18 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
 
-/// Topbar del dashboard: fondo rosado oscuro con forma de ola inferior,
-/// saludo, chips de rol/país y avatar de iniciales.
 class DashboardHeader extends StatelessWidget {
   const DashboardHeader({
     super.key,
     this.userRole = 'Superadmin',
     this.country = 'Global',
+    this.onLogout,
   });
 
   final String userRole;
   final String country;
-
-  String get _initials {
-    final p = userRole.trim().split(' ');
-    return p.length >= 2
-        ? '${p[0][0]}${p[1][0]}'.toUpperCase()
-        : userRole.substring(0, 2).toUpperCase();
-  }
+  final VoidCallback? onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +20,18 @@ class DashboardHeader extends StatelessWidget {
     return ClipPath(
       clipper: _WaveClipper(),
       child: Container(
-        color: AppColors.heroBottom,
-        padding: EdgeInsets.fromLTRB(20, top + 14, 20, 36),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.heroTop,
+              AppColors.heroMid1,
+              AppColors.heroMid2,
+            ],
+          ),
+        ),
+        padding: EdgeInsets.fromLTRB(20, top + 14, 20, 48),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -56,7 +60,8 @@ class DashboardHeader extends StatelessWidget {
           children: [
             Icon(Icons.wifi, size: 13, color: Colors.white.withOpacity(0.70)),
             const SizedBox(width: 4),
-            Icon(Icons.battery_full_rounded, size: 13, color: Colors.white.withOpacity(0.70)),
+            Icon(Icons.battery_full_rounded, size: 13,
+                color: Colors.white.withOpacity(0.70)),
           ],
         ),
       ],
@@ -75,9 +80,9 @@ class DashboardHeader extends StatelessWidget {
                 'Bienvenido 👋',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: -0.3,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 10),
@@ -92,59 +97,71 @@ class DashboardHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        _buildAvatar(),
+        _buildLogoutButton(),
       ],
     );
   }
 
   Widget _buildChip(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.25),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 11, color: Colors.white.withOpacity(0.75)),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.30),
+              width: 0.5,
             ),
           ),
-        ],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 11, color: Colors.white.withOpacity(0.85)),
+              const SizedBox(width: 5),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildAvatar() {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withOpacity(0.20),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.40),
-          width: 1.5,
-        ),
-      ),
-      child: Center(
-        child: Text(
-          _initials,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
+  Widget _buildLogoutButton() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: GestureDetector(
+          onTap: onLogout,
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.40),
+                width: 1.5,
+              ),
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.logout_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
           ),
         ),
       ),
@@ -158,7 +175,7 @@ class _WaveClipper extends CustomClipper<Path> {
     final path = Path()
       ..lineTo(0, size.height - 22)
       ..quadraticBezierTo(
-        size.width / 2, size.height + 12,
+        size.width / 2, size.height + 16,
         size.width, size.height - 22,
       )
       ..lineTo(size.width, 0)

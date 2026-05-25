@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mobile/country_home_screen.dart';
+import 'package:mobile/constants/app_colors.dart ';
+
 
 class HomeHero extends StatelessWidget {
   const HomeHero({super.key});
@@ -22,7 +24,12 @@ class HomeHero extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF6A0080), Color(0xFF9C27B0), Color(0xFF7B1FA2)],
+          colors: [
+            AppColors.heroTop,
+            AppColors.heroMid1,
+            AppColors.heroMid2,
+            AppColors.heroBottom,
+          ],
         ),
       ),
       child: Column(
@@ -47,16 +54,23 @@ class HomeHero extends StatelessWidget {
           const Text(
             'Una red que une personas, empresas y comunidades, para construir una región más humana, productiva y consciente.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 15, height: 1.6, fontWeight: FontWeight.w300),
+            style: TextStyle(
+              color: AppColors.heroText,
+              fontSize: 15,
+              height: 1.6,
+              fontWeight: FontWeight.w300,
+            ),
           ),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
-              Icon(Icons.touch_app_outlined, color: Colors.white54, size: 14),
+              Icon(Icons.touch_app_outlined, color: AppColors.heroSubText, size: 14),
               SizedBox(width: 6),
-              Text('Toca un logo para explorar cada país',
-                  style: TextStyle(color: Colors.white54, fontSize: 11)),
+              Text(
+                'Toca un logo para explorar cada país',
+                style: TextStyle(color: AppColors.heroSubText, fontSize: 11),
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -66,13 +80,15 @@ class HomeHero extends StatelessWidget {
               mode: LaunchMode.externalApplication,
             ),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: const BorderSide(color: Colors.white54, width: 1.2),
+              foregroundColor: AppColors.heroText,
+              side: const BorderSide(color: AppColors.heroSubText, width: 1.2),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
             ),
-            child: const Text('Conoce más',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            child: const Text(
+              'Conoce más',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
           ),
         ],
       ),
@@ -107,10 +123,10 @@ class _PaisCircle extends StatelessWidget {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white,
+              color: AppColors.background,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: AppColors.primaryDark.withOpacity(0.25),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -137,10 +153,10 @@ class _PaisCircle extends StatelessWidget {
                       width: 14,
                       height: 14,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF4CAF50),
+                        color: AppColors.activityPubIcon, // verde
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.arrow_forward, size: 9, color: Colors.white),
+                      child: const Icon(Icons.arrow_forward, size: 9, color: AppColors.heroText),
                     ),
                   ),
               ],
@@ -151,14 +167,16 @@ class _PaisCircle extends StatelessWidget {
         Text(
           nombre,
           style: TextStyle(
-            color: tappable ? Colors.white : Colors.white54,
+            color: tappable ? AppColors.heroText : AppColors.heroSubText,
             fontSize: 9,
             fontWeight: tappable ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
         if (tappable)
-          const Text('Ver portal',
-              style: TextStyle(color: Colors.white38, fontSize: 8)),
+          const Text(
+            'Ver portal',
+            style: TextStyle(color: AppColors.heroSubText, fontSize: 8),
+          ),
       ],
     );
   }

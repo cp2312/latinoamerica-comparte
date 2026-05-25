@@ -130,4 +130,20 @@ class DashboardService {
       return null;
     }
   }
+
+  // GET /dashboard/metricas-pais — solo para admin_pais
+  Future<Map<String, dynamic>?> getMetricasPais() async {
+    try {
+      final res = await http.get(
+        Uri.parse('$_baseUrl/dashboard/metricas-pais'),
+        headers: await _headers(),
+      );
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body) as Map<String, dynamic>;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/constants/app_colors.dart';
 
-/// Hero rosado oscuro reutilizable para formularios de noticias.
-/// Incluye botón de volver, título de pantalla, título de noticia y subtítulo.
+
 class NewsFormHero extends StatelessWidget {
   const NewsFormHero({
     super.key,

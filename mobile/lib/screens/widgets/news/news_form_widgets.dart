@@ -51,6 +51,7 @@ class NewsFormField extends StatelessWidget {
   Widget _buildField() {
     return TextFormField(
       controller: controller,
+        enabled: enabled,
       maxLines: maxLines,
       keyboardType: keyboardType,
       validator: validator,
@@ -105,6 +106,7 @@ class NewsFormDropdown<T> extends StatelessWidget {
     required this.value,
     required this.items,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final String label;
@@ -112,6 +114,7 @@ class NewsFormDropdown<T> extends StatelessWidget {
   final T value;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?> onChanged;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -127,36 +130,71 @@ class NewsFormDropdown<T> extends StatelessWidget {
             letterSpacing: 0.8,
           ),
         ),
+
         const SizedBox(height: 5),
+
         DropdownButtonFormField<T>(
           value: value,
           items: items,
-          onChanged: onChanged,
-          style: const TextStyle(
-            color: AppColors.fieldText,
+
+          // 👇 SI ESTÁ DESHABILITADO NO PERMITE CAMBIAR
+          onChanged: enabled ? onChanged : null,
+
+          style: TextStyle(
+            color: enabled
+                ? AppColors.fieldText
+                : Colors.grey,
             fontSize: 13,
           ),
-          icon: const Icon(
+
+          icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: AppColors.fieldIcon,
+            color: enabled
+                ? AppColors.fieldIcon
+                : Colors.grey,
           ),
+
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20, color: AppColors.fieldIcon),
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14, vertical: 13,
+            prefixIcon: Icon(
+              icon,
+              size: 20,
+              color: enabled
+                  ? AppColors.fieldIcon
+                  : Colors.grey,
             ),
+
+            filled: true,
+
+            fillColor: enabled
+                ? Colors.white
+                : Colors.grey.shade100,
+
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 13,
+            ),
+
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: const BorderSide(
-                color: AppColors.fieldBorder, width: 1,
+                color: AppColors.fieldBorder,
+                width: 1,
               ),
             ),
+
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: const BorderSide(
-                color: AppColors.fieldFocused, width: 1.5,
+                color: AppColors.fieldFocused,
+                width: 1.5,
+              ),
+            ),
+
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: Colors.grey.shade300,
+                width: 1,
               ),
             ),
           ),
@@ -165,7 +203,6 @@ class NewsFormDropdown<T> extends StatelessWidget {
     );
   }
 }
-
 /// Selector de imagen con fondo rosado punteado.
 class NewsImagePicker extends StatelessWidget {
   const NewsImagePicker({
