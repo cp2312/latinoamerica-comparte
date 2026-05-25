@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/login_screen.dart';
 import 'package:mobile/services/news_service.dart';
+import 'package:mobile/services/testimonios_service.dart';
 import 'package:mobile/screens/models/news_model.dart';
+import 'package:mobile/screens/models/testimonio_model.dart';
 import 'package:mobile/screens/widgets/home/home_news_card.dart';
 import 'package:mobile/screens/widgets/home/home_section_title.dart';
 import 'package:mobile/screens/widgets/home/home_testimonial_card.dart';
@@ -21,7 +23,6 @@ class _PaisConfig {
   final String programaDestacado;
   final String descripcionPrograma;
   final IconData iconaPrograma;
-  final List<Map<String, String>> testimonios;
 
   const _PaisConfig({
     required this.nombre,
@@ -35,7 +36,6 @@ class _PaisConfig {
     required this.programaDestacado,
     required this.descripcionPrograma,
     required this.iconaPrograma,
-    required this.testimonios,
   });
 }
 
@@ -59,26 +59,6 @@ final _configs = <String, _PaisConfig>{
     descripcionPrograma:
         'Impulsamos el emprendimiento personal en ciudades como Bogotá, Medellín y Cali.',
     iconaPrograma: Icons.storefront_outlined,
-    testimonios: [
-      {
-        'nombre': 'María González',
-        'pais': 'Colombia',
-        'texto':
-            'Gracias al programa Edifica pude abrir mi tienda en Bogotá y recuperar la estabilidad de mi familia.',
-      },
-      {
-        'nombre': 'Andrés Morales',
-        'pais': 'Colombia',
-        'texto':
-            'El apoyo de Latinoamérica Comparte me ayudó a crecer mi negocio en Medellín. Hoy tengo 3 empleados.',
-      },
-      {
-        'nombre': 'Luz Esperanza Ríos',
-        'pais': 'Colombia',
-        'texto':
-            'Con el programa Nodus aprendí a liderar mi empresa con visión. Mis ingresos crecieron un 40% en seis meses.',
-      },
-    ],
   ),
 
   // ── CHILE ─────────────────────────────────────────────────────────────────
@@ -100,26 +80,6 @@ final _configs = <String, _PaisConfig>{
     descripcionPrograma:
         'Formamos líderes empresariales en Santiago, Valparaíso y Concepción con herramientas de gestión real.',
     iconaPrograma: Icons.leaderboard_outlined,
-    testimonios: [
-      {
-        'nombre': 'Carlos Rojas',
-        'pais': 'Chile',
-        'texto':
-            'El programa Nodus me dio las herramientas para liderar mi empresa en Santiago con visión y propósito.',
-      },
-      {
-        'nombre': 'Valentina Muñoz',
-        'pais': 'Chile',
-        'texto':
-            'Gracias al acompañamiento de Latinoamérica Comparte pude escalar mi emprendimiento en Valparaíso.',
-      },
-      {
-        'nombre': 'Diego Fuentes',
-        'pais': 'Chile',
-        'texto':
-            'La formación empresarial que recibí cambió completamente mi forma de ver los negocios en Chile.',
-      },
-    ],
   ),
 
   // ── ARGENTINA ────────────────────────────────────────────────────────────
@@ -141,26 +101,6 @@ final _configs = <String, _PaisConfig>{
     descripcionPrograma:
         'Impulsamos emprendedores en Buenos Aires, Córdoba y Rosario con mentoría y planes de negocio personalizados.',
     iconaPrograma: Icons.emoji_people_outlined,
-    testimonios: [
-      {
-        'nombre': 'Lucía Fernández',
-        'pais': 'Argentina',
-        'texto':
-            'El programa Edifica me dio las herramientas para montar mi emprendimiento en Buenos Aires. Hoy tengo clientes en toda la ciudad.',
-      },
-      {
-        'nombre': 'Martín Álvarez',
-        'pais': 'Argentina',
-        'texto':
-            'Gracias al acompañamiento de Latinoamérica Comparte pude relanzar mi negocio en Córdoba después de la crisis.',
-      },
-      {
-        'nombre': 'Sofía Pereyra',
-        'pais': 'Argentina',
-        'texto':
-            'La mentoría personalizada que recibí en Rosario fue clave. En seis meses dupliqué mis ingresos.',
-      },
-    ],
   ),
 
   // ── ECUADOR ───────────────────────────────────────────────────────────────
@@ -170,45 +110,25 @@ final _configs = <String, _PaisConfig>{
     bandera: '🇪🇨',
     gradiente: const [
       Color(0xFFFFD100), // amarillo bandera
-      Color(0xFF006B3F), // verde bandera
-      Color(0xFF003580), // azul bandera
+      Color(0xFF0033A0), // azul bandera
+      Color(0xFFEF3340), // rojo bandera
     ],
-    appBarColor: const Color(0xFF006B3F),
-    accentColor: const Color(0xFF003580),
-    tagline: 'El emprendimiento que mueve Ecuador',
+    appBarColor: const Color(0xFF0033A0),
+    accentColor: const Color(0xFFEF3340),
+    tagline: 'Sembrando futuro en Ecuador',
     subtitulo:
-        'Impulsamos a personas y familias ecuatorianas para que reinventen sus fuentes de ingreso con apoyo real.',
+        'Apoyamos a familias ecuatorianas en la construcción de emprendimientos sostenibles y con propósito.',
     programaDestacado: 'Programa Edifica Ecuador',
     descripcionPrograma:
-        'Acompañamos emprendedores en Quito, Guayaquil y Cuenca con planes de negocio y mentorías personalizadas.',
-    iconaPrograma: Icons.rocket_launch_outlined,
-    testimonios: [
-      {
-        'nombre': 'Ana Torres',
-        'pais': 'Ecuador',
-        'texto':
-            'No imaginé que en tan poco tiempo lograría estabilizar mis ingresos. Latinoamérica Comparte cambió mi vida en Quito.',
-      },
-      {
-        'nombre': 'Roberto Vera',
-        'pais': 'Ecuador',
-        'texto':
-            'Gracias al programa Edifica pude iniciar mi negocio en Guayaquil. Hoy soy mi propio jefe.',
-      },
-      {
-        'nombre': 'Patricia Lema',
-        'pais': 'Ecuador',
-        'texto':
-            'El acompañamiento personalizado que recibí en Cuenca fue clave para superar la crisis económica.',
-      },
-    ],
+        'Desarrollamos emprendedores en Quito, Guayaquil y Cuenca con acompañamiento personalizado.',
+    iconaPrograma: Icons.eco_outlined,
   ),
 };
 
 // ── Pantalla principal por país ───────────────────────────────────────────────
 
 class CountryHomeScreen extends StatelessWidget {
-  /// Recibe el nombre del país en minúsculas: 'colombia', 'chile', 'ecuador'
+  /// Recibe el nombre del país en minúsculas: 'colombia', 'chile', 'ecuador', 'argentina'
   final String pais;
 
   const CountryHomeScreen({super.key, required this.pais});
@@ -305,13 +225,13 @@ class CountryHomeScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Testimonios del país
+            // ── Testimonios desde la API filtrados por país ───────────────
             HomeSectionTitle(
               titulo: 'Historias de éxito',
               icono: Icons.format_quote_rounded,
             ),
             const SizedBox(height: 12),
-            _CountryTestimonialsSection(config: config),
+            _CountryTestimonialsSection(pais: config.nombre),
 
             const SizedBox(height: 24),
 
@@ -554,29 +474,55 @@ class _CountryNewsSection extends StatelessWidget {
   }
 }
 
-// ── Sección testimonios del país ──────────────────────────────────────────────
+// ── Sección testimonios del país — datos reales desde la API ──────────────────
+//
+// Se reemplaza el uso de testimonios hardcodeados en _PaisConfig por un
+// FutureBuilder que llama a TestimoniosService().getTestimoniosPublicos(pais:)
+// para traer solo los testimonios publicados del país actual.
 
 class _CountryTestimonialsSection extends StatelessWidget {
-  final _PaisConfig config;
-  const _CountryTestimonialsSection({required this.config});
+  final String pais;
+  const _CountryTestimonialsSection({required this.pais});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 190,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: config.testimonios.length,
-        itemBuilder: (context, index) {
-          final t = config.testimonios[index];
-          return HomeTestimonialCard(
-            nombre: t['nombre']!,
-            pais: t['pais']!,
-            texto: t['texto']!,
+    return FutureBuilder<List<TestimonioModel>>(
+      future: TestimoniosService().getTestimoniosPublicos(pais: pais.toLowerCase()),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: CircularProgressIndicator(color: Color(0xFF6A0080)),
+            ),
           );
-        },
-      ),
+        }
+
+        final testimonios = snapshot.data ?? [];
+        if (testimonios.isEmpty) {
+          return _EmptyState(
+            mensaje: 'No hay testimonios publicados en $pais aún',
+          );
+        }
+
+        return SizedBox(
+          height: 220,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: testimonios.length,
+            itemBuilder: (context, index) {
+              final t = testimonios[index];
+              return HomeTestimonialCard(
+                nombre: t.nombre,
+                pais: t.pais,
+                texto: t.testimonio,
+                fotoUrl: t.fotoUrl,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
