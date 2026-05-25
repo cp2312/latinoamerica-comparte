@@ -539,7 +539,7 @@ class _CountryNewsSection extends StatelessWidget {
         }
 
         return SizedBox(
-          height: 220,
+          height: 380,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),

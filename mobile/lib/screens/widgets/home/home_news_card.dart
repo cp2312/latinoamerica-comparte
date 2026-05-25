@@ -29,7 +29,6 @@ class HomeNewsCard extends StatelessWidget {
       return '';
     }
 
-    // Mongo guarda: /uploads/imagen.jpg
     return 'http://127.0.0.1:3000${noticia.image}';
   }
 
@@ -86,6 +85,7 @@ class HomeNewsCard extends StatelessWidget {
                   ),
           ),
 
+          /// CONTENIDO
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -118,37 +118,39 @@ class HomeNewsCard extends StatelessWidget {
                   const SizedBox(height: 10),
 
                   /// TÍTULO
-                  Flexible(
-                    child: Text(
-                      noticia.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2E2E2E),
-                        height: 1.4,
+                  Text(
+                    noticia.title,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2E2E2E),
+                      height: 1.4,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// CONTENIDO CON SCROLL
+                  Expanded(
+                    child: Scrollbar(
+                      thumbVisibility: true,
+                      radius: const Radius.circular(10),
+                      child: SingleChildScrollView(
+                        child: Text(
+                          noticia.content,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black54,
+                            height: 1.5,
+                          ),
+                        ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 8),
-
-                  /// CONTENIDO
-                  Flexible(
-                    child: Text(
-                      noticia.content,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.black54,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-
-                  const Spacer(),
+                  const SizedBox(height: 12),
 
                   /// BADGE
                   Container(

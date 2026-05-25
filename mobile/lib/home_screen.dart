@@ -628,7 +628,7 @@ class _NewsSection extends StatelessWidget {
         }
 
         return SizedBox(
-          height: 300,
+          height: 380,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
