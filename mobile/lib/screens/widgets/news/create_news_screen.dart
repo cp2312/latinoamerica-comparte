@@ -29,7 +29,17 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   String userRole = '';
   String userCountry = '';
 
-  static const _countries = ['Colombia', 'Chile', 'Argentina', 'Ecuador'];
+  static const _countries = [
+    'Colombia',
+    'Chile',
+    'Argentina',
+    'Ecuador',
+  ];
+
+  static const _statusList = [
+    'borrador',
+    'publicado',
+  ];
 
   @override
   void initState() {
@@ -50,6 +60,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
       userRole = role;
       userCountry = country;
 
+      // ADMIN-PAIS → país fijo
       if (role == 'admin_pais') {
         selectedCountry = country;
       } else {
@@ -109,11 +120,16 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          success ? 'Noticia creada correctamente' : 'Error al guardar noticia',
+          success
+              ? 'Noticia creada correctamente'
+              : 'Error al guardar noticia',
         ),
-        backgroundColor: success ? AppColors.primary : Colors.redAccent,
+        backgroundColor:
+            success ? AppColors.primary : Colors.redAccent,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
 
@@ -127,9 +143,13 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
   // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    // Esperar datos del usuario
+    // Esperar carga del usuario
     if (selectedCountry.isEmpty) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     final isAdminPais = userRole == 'admin_pais';
@@ -152,6 +172,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
+
                     // ───────── TÍTULO ─────────
                     NewsFormField(
                       label: 'Título',
@@ -170,7 +191,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
 
                     // ───────── PAÍS ─────────
 
-                    // ADMIN-PAIS → país bloqueado
+                    // ADMIN-PAIS → bloqueado
                     if (isAdminPais)
                       NewsFormField(
                         label: 'País',
@@ -181,6 +202,7 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                         hint: '',
                         enabled: false,
                       )
+
                     // SUPERADMIN → dropdown completo
                     else
                       NewsFormDropdown<String>(
@@ -217,7 +239,25 @@ class _CreateNewsScreenState extends State<CreateNewsScreen> {
                       },
                     ),
 
-                
+                    const SizedBox(height: 14),
+
+                    // ───────── ESTADO ─────────
+                    NewsFormDropdown<String>(
+                      label: 'Estado',
+                      icon: Icons.toggle_on_outlined,
+                      value: selectedStatus,
+                      items: _statusList.map((status) {
+                        return DropdownMenuItem(
+                          value: status,
+                          child: Text(status),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedStatus = value!;
+                        });
+                      },
+                    ),
 
                     const SizedBox(height: 14),
 

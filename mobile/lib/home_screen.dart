@@ -628,7 +628,7 @@ class _NewsSection extends StatelessWidget {
         }
 
         return SizedBox(
-          height: 300,
+          height: 380,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -672,7 +672,7 @@ class _TestimonialsSection extends StatelessWidget {
         }
 
         return SizedBox(
-          height: 190,
+          height: 220,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
