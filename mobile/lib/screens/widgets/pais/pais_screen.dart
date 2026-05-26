@@ -21,8 +21,9 @@ class PaisesScreen extends StatefulWidget {
 class _PaisesScreenState extends State<PaisesScreen> {
   final _service = PaisesService();
  
-  List<PaisModel> _paises   = [];
-  bool            _cargando = true;
+  List<PaisModel>   _paises      = [];
+  bool              _cargando    = true;
+  final Set<String> _actualizando = {}; // ids con toggle en curso
  
   @override
   void initState() {
@@ -31,8 +32,8 @@ class _PaisesScreenState extends State<PaisesScreen> {
   }
  
   // ── Carga inicial ──────────────────────────────────────────────────────────
-  Future<void> _cargar() async {
-    setState(() => _cargando = true);
+  Future<void> _cargar({bool mostrarSpinner = true}) async {
+    if (mostrarSpinner) setState(() => _cargando = true);
     final data = await _service.getPaises();
     if (!mounted) return;
     setState(() { _paises = data; _cargando = false; });
@@ -40,12 +41,28 @@ class _PaisesScreenState extends State<PaisesScreen> {
  
   // ── Toggle de estado (el switch de la tarjeta) ─────────────────────────────
   Future<void> _toggleEstado(PaisModel pais, bool activar) async {
+    // Actualización optimista: cambia el estado en memoria de inmediato
+    setState(() {
+      _actualizando.add(pais.id);
+      final idx = _paises.indexWhere((p) => p.id == pais.id);
+      if (idx != -1) {
+        _paises[idx] = PaisModel(
+          id:        pais.id,
+          nombre:    pais.nombre,
+          estado:    activar ? 'activo' : 'inactivo',
+          createdAt: pais.createdAt,
+        );
+      }
+    });
+
     final nuevoEstado = activar ? 'activo' : 'inactivo';
     final ok = await _service.cambiarEstado(pais.id, nuevoEstado);
     if (!mounted) return;
- 
+
     if (ok) {
-      _cargar(); // refresca la lista desde el servidor
+      // Recarga silenciosa para sincronizar con el servidor
+      await _cargar(mostrarSpinner: false);
+      if (!mounted) return;
       _showSnack(
         activar
             ? '${pais.bandera} ${pais.nombre} activado'
@@ -53,8 +70,13 @@ class _PaisesScreenState extends State<PaisesScreen> {
         activar ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
       );
     } else {
+      // Revertir actualización optimista si falló
+      await _cargar(mostrarSpinner: false);
+      if (!mounted) return;
       _showSnack('No se pudo actualizar el estado', Colors.red);
     }
+
+    if (mounted) setState(() => _actualizando.remove(pais.id));
   }
  
   // ── Diálogo crear / editar ─────────────────────────────────────────────────
@@ -126,7 +148,8 @@ class _PaisesScreenState extends State<PaisesScreen> {
  
               if (!mounted) return;
               if (ok) {
-                _cargar();
+                await _cargar(mostrarSpinner: false);
+                if (!mounted) return;
                 _showSnack(
                   esEdicion ? 'País actualizado' : 'País creado',
                   const Color(0xFF10B981),
@@ -188,7 +211,8 @@ class _PaisesScreenState extends State<PaisesScreen> {
     if (!mounted) return;
  
     if (ok) {
-      _cargar();
+      await _cargar(mostrarSpinner: false);
+      if (!mounted) return;
       _showSnack('${pais.nombre} eliminado', const Color(0xFF10B981));
     } else {
       _showSnack('No se pudo eliminar', Colors.red);
@@ -223,7 +247,7 @@ class _PaisesScreenState extends State<PaisesScreen> {
         actions: [
           IconButton(
             icon:      const Icon(Icons.refresh_rounded),
-            onPressed: _cargar,
+            onPressed: () => _cargar(mostrarSpinner: false),
             tooltip:   'Recargar',
           ),
         ],
@@ -252,7 +276,7 @@ class _PaisesScreenState extends State<PaisesScreen> {
  
     return RefreshIndicator(
       color:      AppColors.primary,
-      onRefresh:  _cargar,
+      onRefresh:  () => _cargar(mostrarSpinner: false),
       child: ListView(
         padding: const EdgeInsets.only(top: 12, bottom: 100),
         children: [
@@ -268,6 +292,7 @@ class _PaisesScreenState extends State<PaisesScreen> {
             ),
             ...activos.map((p) => PaisCard(
                   pais:           p,
+                  cargando:       _actualizando.contains(p.id),
                   onToggleEstado: (v) => _toggleEstado(p, v),
                 )),
           ],
@@ -282,6 +307,7 @@ class _PaisesScreenState extends State<PaisesScreen> {
             ),
             ...inactivos.map((p) => PaisCard(
                   pais:           p,
+                  cargando:       _actualizando.contains(p.id),
                   onToggleEstado: (v) => _toggleEstado(p, v),
                 )),
           ],

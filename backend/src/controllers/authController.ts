@@ -35,8 +35,12 @@ const login = async (req: Request, res: Response): Promise<void> => {
     // Validar país activo
     if (user.rol === 'admin_pais' && user.pais) {
       const pais = await Pais.findOne({
-        nombre: user.pais,
+        nombre: { $regex: new RegExp(`^${user.pais}$`, 'i') }
       });
+
+      // ← AGREGA ESTAS DOS LÍNEAS AQUÍ
+      console.log('user.pais:', user.pais);
+      console.log('pais encontrado:', pais);
 
       if (!pais || pais.estado === 'inactivo') {
         res.status(403).json({
@@ -107,8 +111,8 @@ const forgotPassword = async (
         expiresIn: '15m',
       }
     );
-const resetLink =
-  `http://localhost:5000/#/reset-password/${resetToken}`;
+    const resetLink =
+      `http://localhost:5000/#/reset-password/${resetToken}`;
 
     // Configuración del correo
     const transporter = nodemailer.createTransport({

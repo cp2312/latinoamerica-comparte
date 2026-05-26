@@ -9,10 +9,12 @@ class PaisCard extends StatelessWidget {
     super.key,
     required this.pais,
     required this.onToggleEstado,
+    this.cargando = false,
   });
- 
+
   final PaisModel pais;
   final Future<void> Function(bool activo) onToggleEstado;
+  final bool cargando; // true mientras el toggle está en curso
  
   // ── Colores y etiqueta según estado ───────────────────────────────────────
   Color get _colorEstado =>
@@ -96,13 +98,25 @@ class PaisCard extends StatelessWidget {
             ),
  
             // Switch — única acción disponible
-            Switch(
-              value:              pais.estaActivo,
-              onChanged:          onToggleEstado,
-              activeColor:        AppColors.primary,
-              inactiveThumbColor: const Color(0xFFF59E0B),
-              inactiveTrackColor: const Color(0xFFFEF3C7),
-            ),
+            cargando
+                ? const SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Padding(
+                      padding: EdgeInsets.all(8),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Color(0xFF4A0030),
+                      ),
+                    ),
+                  )
+                : Switch(
+                    value:              pais.estaActivo,
+                    onChanged:          onToggleEstado,
+                    activeColor:        AppColors.primary,
+                    inactiveThumbColor: const Color(0xFFF59E0B),
+                    inactiveTrackColor: const Color(0xFFFEF3C7),
+                  ),
           ],
         ),
       ),

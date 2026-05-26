@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mobile/country_home_screen.dart';
-import 'package:mobile/constants/app_colors.dart ';
+import 'package:mobile/mantenimiento_screen.dart';
+import 'package:mobile/services/paises_services.dart';
+import 'package:mobile/constants/app_colors.dart';
 
 
-class HomeHero extends StatelessWidget {
+class HomeHero extends StatefulWidget {
   const HomeHero({super.key});
 
+  @override
+  State<HomeHero> createState() => _HomeHeroState();
+}
+
+class _HomeHeroState extends State<HomeHero> {
   static const _paises = [
     {'imagen': 'assets/images/logo_colombia.png',  'nombre': 'Colombia',      'ruta': 'colombia'},
     {'imagen': 'assets/images/logo_ecuador.png',   'nombre': 'Ecuador',       'ruta': 'ecuador'},
@@ -14,6 +21,41 @@ class HomeHero extends StatelessWidget {
     {'imagen': 'assets/images/logo_chile.png',     'nombre': 'Chile',         'ruta': 'chile'},
     {'imagen': 'assets/images/logo_argentina.png', 'nombre': 'Argentina',     'ruta': 'argentina'},
   ];
+
+  final Set<String> _navegando = {}; // rutas con petición en curso
+
+  // Valida el estado del país antes de navegar
+  Future<void> _irAPortal(BuildContext context, String ruta) async {
+    if (_navegando.contains(ruta)) return;
+    setState(() => _navegando.add(ruta));
+
+    try {
+      final paises = await PaisesService().getPaises();
+      final match = paises.where(
+        (p) => p.nombre.toLowerCase() == ruta.toLowerCase(),
+      ).toList();
+
+      if (!mounted) return;
+
+      // Si no se encontró o está inactivo → pantalla de mantenimiento
+      final activo = match.isNotEmpty && match.first.estaActivo;
+
+      if (activo) {
+        Navigator.push(context,
+          MaterialPageRoute(builder: (_) => CountryHomeScreen(pais: ruta)));
+      } else {
+        Navigator.push(context,
+          MaterialPageRoute(builder: (_) => const MantenimientoScreen()));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      // Si falla la red, deja pasar (fail-open)
+      Navigator.push(context,
+        MaterialPageRoute(builder: (_) => CountryHomeScreen(pais: ruta)));
+    } finally {
+      if (mounted) setState(() => _navegando.remove(ruta));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +82,12 @@ class HomeHero extends StatelessWidget {
               final ruta   = p['ruta'] as String?;
               final grande = p['nombre'] == 'Latinoamérica';
               return _PaisCircle(
-                imagen: p['imagen']! as String,
-                nombre: p['nombre']! as String,
-                grande: grande,
-                onTap: ruta != null
-                    ? () => Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => CountryHomeScreen(pais: ruta)))
+                imagen:    p['imagen']! as String,
+                nombre:    p['nombre']! as String,
+                grande:    grande,
+                cargando:  ruta != null && _navegando.contains(ruta),
+                onTap:     ruta != null
+                    ? () => _irAPortal(context, ruta)
                     : null,
               );
             }).toList(),
@@ -100,12 +142,14 @@ class _PaisCircle extends StatelessWidget {
   final String        imagen;
   final String        nombre;
   final bool          grande;
+  final bool          cargando;
   final VoidCallback? onTap;
 
   const _PaisCircle({
     required this.imagen,
     required this.nombre,
-    this.grande = false,
+    this.grande   = false,
+    this.cargando = false,
     this.onTap,
   });
 
@@ -117,7 +161,7 @@ class _PaisCircle extends StatelessWidget {
     return Column(
       children: [
         GestureDetector(
-          onTap: onTap,
+          onTap: cargando ? null : onTap,
           child: Container(
             width: size,
             height: size,
@@ -145,7 +189,24 @@ class _PaisCircle extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (tappable)
+                if (cargando)
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.25),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: SizedBox(
+                          width: 22, height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (tappable && !cargando)
                   Positioned(
                     right: 2,
                     bottom: 2,

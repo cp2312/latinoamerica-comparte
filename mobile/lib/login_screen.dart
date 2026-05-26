@@ -51,10 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await AuthService().login(
-      correo: email,
-      password: password,
-    );
+    final result = await AuthService().login(correo: email, password: password);
 
     if (!mounted) return;
 
@@ -65,16 +62,13 @@ class _LoginScreenState extends State<LoginScreen> {
       final codigo = result['codigo'] as String;
 
       if (codigo == 'PAIS_INACTIVO') {
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (_) => const MantenimientoScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const MantenimientoScreen()),
+          (route) => false,
         );
       } else {
-        _showSnack(
-          result['message'] ?? 'Error al iniciar sesión',
-        );
+        _showSnack(result['message'] ?? 'Error al iniciar sesión');
       }
 
       return;
@@ -87,9 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
       case 'superadmin':
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => const DashboardScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
         );
         break;
 
@@ -98,16 +90,13 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) =>
-                DashboardAdminPaisScreen(usuario: user),
+            builder: (_) => DashboardAdminPaisScreen(usuario: user),
           ),
         );
         break;
 
       default:
-        _showSnack(
-          'Rol no reconocido: ${user.rol}',
-        );
+        _showSnack('Rol no reconocido: ${user.rol}');
     }
   }
 
@@ -125,14 +114,12 @@ class _LoginScreenState extends State<LoginScreen> {
   // RECUPERAR CONTRASEÑA
   // ─────────────────────────────────────────────
 
- void _onForgotPassword() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const ForgotPasswordScreen(),
-    ),
-  );
-}
+  void _onForgotPassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+    );
+  }
 
   // ─────────────────────────────────────────────
   // SNACKBAR
@@ -144,9 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
         content: Text(message),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
